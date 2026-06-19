@@ -42,8 +42,10 @@ export default function AdminLoginPage() {
     ]);
 
     setTimeout(() => {
-      // Default template credentials: admin / admin
-      if (username === "admin" && password === "admin") {
+      const expectedUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME || "admin";
+      const expectedPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin";
+
+      if (username === expectedUsername && password === expectedPassword) {
         setTerminalHistory((prev) => [...prev, "Access GRANTED.", "Establishing terminal session..."]);
         localStorage.setItem("admin_session", "true");
         setTimeout(() => {
@@ -152,9 +154,11 @@ export default function AdminLoginPage() {
           </form>
         </div>
 
-        <p className="text-center font-mono text-[9px] text-text-tertiary mt-4">
-          // Hint: default credentials are Username: <span className="text-accent-primary">admin</span> | Pass: <span className="text-accent-primary">admin</span>
-        </p>
+        {!process.env.NEXT_PUBLIC_ADMIN_USERNAME && (
+          <p className="text-center font-mono text-[9px] text-text-tertiary mt-4">
+            // Hint: default credentials are Username: <span className="text-accent-primary">admin</span> | Pass: <span className="text-accent-primary">admin</span>
+          </p>
+        )}
       </div>
     </div>
   );
