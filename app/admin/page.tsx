@@ -58,12 +58,7 @@ export default function AdminDashboardPage() {
   const [socialScholar, setSocialScholar] = useState("");
   
   // Skills Form fields
-  const [skillsBackend, setSkillsBackend] = useState("");
-  const [skillsFrontend, setSkillsFrontend] = useState("");
-  const [skillsAiMl, setSkillsAiMl] = useState("");
-  const [skillsDatabases, setSkillsDatabases] = useState("");
-  const [skillsDevOps, setSkillsDevOps] = useState("");
-  const [skillsArchitecture, setSkillsArchitecture] = useState("");
+  const [skillsList, setSkillsList] = useState<{ title: string; items: string }[]>([]);
   
   // Global Notification
   const [notif, setNotif] = useState({ show: false, message: "", type: "success" });
@@ -100,12 +95,22 @@ export default function AdminDashboardPage() {
     setSocialMedium(profile.socials.medium || "");
     setSocialScholar(profile.socials.scholar || "");
 
-    setSkillsBackend(profile.skills?.backend?.join(", ") || "");
-    setSkillsFrontend(profile.skills?.frontendMobile?.join(", ") || "");
-    setSkillsAiMl(profile.skills?.aiMl?.join(", ") || "");
-    setSkillsDatabases(profile.skills?.databases?.join(", ") || "");
-    setSkillsDevOps(profile.skills?.devOpsTools?.join(", ") || "");
-    setSkillsArchitecture(profile.skills?.architectureCertifications?.join(", ") || "");
+    const rawSkills = profile.skills;
+    const initialSkills = Array.isArray(rawSkills) 
+      ? rawSkills 
+      : [
+          { title: "Backend Development", items: (rawSkills as any)?.backend || [] },
+          { title: "Frontend & Mobile", items: (rawSkills as any)?.frontendMobile || [] },
+          { title: "AI / Machine Learning", items: (rawSkills as any)?.aiMl || [] },
+          { title: "Databases & Cache", items: (rawSkills as any)?.databases || [] },
+          { title: "DevOps & Tools", items: (rawSkills as any)?.devOpsTools || [] },
+          { title: "Architecture & Standards", items: (rawSkills as any)?.architectureCertifications || [] }
+        ].filter(c => c.items && c.items.length > 0);
+
+    setSkillsList(initialSkills.map(c => ({
+      title: c.title,
+      items: c.items.join(", ")
+    })));
   }, [router, profile]);
 
   const loadBlogs = () => {
@@ -290,14 +295,10 @@ export default function AdminDashboardPage() {
         careerFocus: profileCareerFocus,
         interests
       },
-      skills: {
-        backend: skillsBackend.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
-        frontendMobile: skillsFrontend.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
-        aiMl: skillsAiMl.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
-        databases: skillsDatabases.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
-        devOpsTools: skillsDevOps.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
-        architectureCertifications: skillsArchitecture.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
-      }
+      skills: skillsList.map(s => ({
+        title: s.title.trim(),
+        items: s.items.split(",").map(i => i.trim()).filter(i => i.length > 0)
+      })).filter(s => s.title.length > 0)
     };
 
     updateProfile(updatedProfile);
@@ -849,90 +850,70 @@ export default function AdminDashboardPage() {
 
                 {/* Skills Section */}
                 <div className="space-y-4 pt-4 border-t border-border-color/60">
-                  <h3 className="font-mono text-xs text-accent-primary font-bold">// 4. Skills & Capabilities (Comma Separated)</h3>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
-                        Backend Development
-                      </label>
-                      <input
-                        type="text"
-                        value={skillsBackend}
-                        onChange={(e) => setSkillsBackend(e.target.value)}
-                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="e.g. Go, Python, Rust"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
-                        Frontend & Mobile
-                      </label>
-                      <input
-                        type="text"
-                        value={skillsFrontend}
-                        onChange={(e) => setSkillsFrontend(e.target.value)}
-                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="e.g. React, Next.js, React Native"
-                      />
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-mono text-xs text-accent-primary font-bold">// 4. Skills & Capabilities</h3>
+                    <button
+                      type="button"
+                      onClick={() => setSkillsList(prev => [...prev, { title: "", items: "" }])}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono text-accent-primary hover:opacity-80 cursor-pointer"
+                    >
+                      + Add Category
+                    </button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
-                        AI / Machine Learning
-                      </label>
-                      <input
-                        type="text"
-                        value={skillsAiMl}
-                        onChange={(e) => setSkillsAiMl(e.target.value)}
-                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="e.g. PyTorch, Hugging Face, Transformers"
-                      />
-                    </div>
+                  <div className="space-y-4">
+                    {skillsList.map((skill, idx) => (
+                      <div key={idx} className="p-4 rounded-xl border border-border-color bg-bg-secondary/40 space-y-3 relative group">
+                        <button
+                          type="button"
+                          onClick={() => setSkillsList(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-3 right-3 p-1 text-text-tertiary hover:text-red-500 rounded bg-bg-tertiary cursor-pointer transition-all"
+                          title="Delete Category"
+                        >
+                          <Trash2 size={12} />
+                        </button>
 
-                    <div>
-                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
-                        Databases & Cache
-                      </label>
-                      <input
-                        type="text"
-                        value={skillsDatabases}
-                        onChange={(e) => setSkillsDatabases(e.target.value)}
-                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="e.g. PostgreSQL, Redis, MongoDB"
-                      />
-                    </div>
-                  </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pr-6">
+                          <div className="sm:col-span-4">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Category Title
+                            </label>
+                            <input
+                              type="text"
+                              value={skill.title}
+                              onChange={(e) => {
+                                const newVal = e.target.value;
+                                setSkillsList(prev => prev.map((s, i) => i === idx ? { ...s, title: newVal } : s));
+                              }}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Backend Development"
+                            />
+                          </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
-                        DevOps & Tools
-                      </label>
-                      <input
-                        type="text"
-                        value={skillsDevOps}
-                        onChange={(e) => setSkillsDevOps(e.target.value)}
-                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="e.g. Docker, Kubernetes, AWS"
-                      />
-                    </div>
+                          <div className="sm:col-span-8">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Skills (Comma Separated)
+                            </label>
+                            <input
+                              type="text"
+                              value={skill.items}
+                              onChange={(e) => {
+                                const newVal = e.target.value;
+                                setSkillsList(prev => prev.map((s, i) => i === idx ? { ...s, items: newVal } : s));
+                              }}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary font-mono"
+                              placeholder="e.g. Go, Rust, Python"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
 
-                    <div>
-                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
-                        Architecture & Standards
-                      </label>
-                      <input
-                        type="text"
-                        value={skillsArchitecture}
-                        onChange={(e) => setSkillsArchitecture(e.target.value)}
-                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="e.g. Microservices, System Design"
-                      />
-                    </div>
+                    {skillsList.length === 0 && (
+                      <p className="text-center font-mono text-[10px] text-text-tertiary py-4 bg-bg-secondary/20 rounded-xl border border-dashed border-border-color animate-fade-in">
+                        No skill categories defined. Click "+ Add Category" to start.
+                      </p>
+                    )}
                   </div>
                 </div>
 

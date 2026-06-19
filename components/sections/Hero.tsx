@@ -98,13 +98,27 @@ export default function Hero() {
         );
         break;
       case "skills":
-        response = (
-          <div className="font-mono text-[10px] text-text-secondary space-y-1">
-            <p><span className="text-accent-secondary font-bold">Backend</span>: {profile.skills.backend.slice(0, 4).join(", ")}</p>
-            <p><span className="text-accent-secondary font-bold">AI / ML</span>: {profile.skills.aiMl.slice(0, 4).join(", ")}</p>
-            <p><span className="text-accent-secondary font-bold">Database</span>: {profile.skills.databases.slice(0, 3).join(", ")}</p>
-          </div>
-        );
+        {
+          const rawSkills = profile.skills;
+          const categoriesList = Array.isArray(rawSkills) 
+            ? rawSkills 
+            : [
+                { title: "Backend Development", items: (rawSkills as any)?.backend || [] },
+                { title: "AI / Machine Learning", items: (rawSkills as any)?.aiMl || [] },
+                { title: "Databases & Cache", items: (rawSkills as any)?.databases || [] }
+              ];
+          response = (
+            <div className="font-mono text-[10px] text-text-secondary space-y-1">
+              {categoriesList.slice(0, 4).map((c, i) => (
+                <p key={i}>
+                  <span className="text-accent-secondary font-bold">
+                    {c.title.replace(" Development", "").replace(" & Tools", "").replace(" & Standards", "")}
+                  </span>: {c.items.slice(0, 4).join(", ")}
+                </p>
+              ))}
+            </div>
+          );
+        }
         break;
       case "projects":
         response = (

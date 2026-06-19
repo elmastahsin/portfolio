@@ -31,8 +31,7 @@ export const metadata: Metadata = {
     "Computer Engineering",
     "Full-Stack Developer",
     "Portfolio",
-    ...profileData.skills.backend,
-    ...profileData.skills.aiMl
+    ...profileData.skills.flatMap(s => s.items)
   ],
   authors: [{ name: profileData.name }],
   creator: profileData.name,

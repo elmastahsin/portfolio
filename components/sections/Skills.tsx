@@ -4,50 +4,45 @@ import React from "react";
 import Card from "../ui/Card";
 import Badge from "../ui/Badge";
 import { useProfile } from "../ProfileContext";
-import { Server, Layout, Brain, Database, Terminal, Shield } from "lucide-react";
+import { Server, Layout, Brain, Database, Terminal, Shield, Code } from "lucide-react";
+
+const iconMap: Record<string, React.ReactNode> = {
+  backend: <Server className="text-accent-primary" size={20} />,
+  frontend: <Layout className="text-accent-primary" size={20} />,
+  ai: <Brain className="text-accent-primary" size={20} />,
+  database: <Database className="text-accent-primary" size={20} />,
+  devops: <Terminal className="text-accent-primary" size={20} />,
+  security: <Shield className="text-accent-primary" size={20} />,
+};
+
+function getIcon(title: string) {
+  const t = title.toLowerCase();
+  if (t.includes("backend") || t.includes("server") || t.includes("api") || t.includes("system")) return iconMap.backend;
+  if (t.includes("frontend") || t.includes("web") || t.includes("mobile") || t.includes("ui") || t.includes("ux") || t.includes("design") || t.includes("client")) return iconMap.frontend;
+  if (t.includes("ai") || t.includes("machine") || t.includes("intelligence") || t.includes("learning") || t.includes("model") || t.includes("nlp") || t.includes("llm")) return iconMap.ai;
+  if (t.includes("data") || t.includes("db") || t.includes("cache") || t.includes("sql") || t.includes("nosql")) return iconMap.database;
+  if (t.includes("devops") || t.includes("cloud") || t.includes("tool") || t.includes("sys") || t.includes("docker") || t.includes("infra")) return iconMap.devops;
+  if (t.includes("architecture") || t.includes("security") || t.includes("standard") || t.includes("design pattern")) return iconMap.security;
+  return <Code className="text-accent-primary" size={20} />;
+}
+
+const badgeColors = ["indigo", "violet", "green", "slate"] as const;
 
 export default function Skills() {
   const { profile } = useProfile();
-  const { skills } = profile;
-
-  const categories = [
-    {
-      title: "Backend Development",
-      icon: <Server className="text-accent-primary" size={20} />,
-      items: skills.backend,
-      color: "indigo" as const
-    },
-    {
-      title: "Frontend & Mobile",
-      icon: <Layout className="text-accent-primary" size={20} />,
-      items: skills.frontendMobile,
-      color: "violet" as const
-    },
-    {
-      title: "AI / Machine Learning",
-      icon: <Brain className="text-accent-primary" size={20} />,
-      items: skills.aiMl,
-      color: "green" as const
-    },
-    {
-      title: "Databases & Cache",
-      icon: <Database className="text-accent-primary" size={20} />,
-      items: skills.databases,
-      color: "slate" as const
-    },
-    {
-      title: "DevOps & Tools",
-      icon: <Terminal className="text-accent-primary" size={20} />,
-      items: skills.devOpsTools,
-      color: "indigo" as const
-    },
-    {
-      title: "Architecture & Standards",
-      icon: <Shield className="text-accent-primary" size={20} />,
-      items: skills.architectureCertifications,
-      color: "violet" as const
-    }
-  ];
+  
+  // Backward compatibility migration for older storage format
+  const rawSkills = profile.skills;
+  const categoriesList: { title: string; items: string[] }[] = Array.isArray(rawSkills) 
+    ? rawSkills 
+    : [
+        { title: "Backend Development", items: (rawSkills as any)?.backend || [] },
+        { title: "Frontend & Mobile", items: (rawSkills as any)?.frontendMobile || [] },
+        { title: "AI / Machine Learning", items: (rawSkills as any)?.aiMl || [] },
+        { title: "Databases & Cache", items: (rawSkills as any)?.databases || [] },
+        { title: "DevOps & Tools", items: (rawSkills as any)?.devOpsTools || [] },
+        { title: "Architecture & Standards", items: (rawSkills as any)?.architectureCertifications || [] }
+      ].filter((c): c is { title: string; items: string[] } => !!c.items && c.items.length > 0);
 
   return (
     <section id="skills" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
@@ -61,28 +56,31 @@ export default function Skills() {
 
       {/* Grid List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map((cat, idx) => (
-          <Card key={idx} hoverEffect={true} glassmorphism={true} className="flex flex-col h-full border border-border-color">
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-5 pb-3 border-b border-border-color">
-              <div className="p-2 rounded-lg bg-accent-muted/40 dark:bg-accent-muted/10 shrink-0">
-                {cat.icon}
+        {categoriesList.map((cat, idx) => {
+          const color = badgeColors[idx % badgeColors.length];
+          return (
+            <Card key={idx} hoverEffect={true} glassmorphism={true} className="flex flex-col h-full border border-border-color">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-5 pb-3 border-b border-border-color">
+                <div className="p-2 rounded-lg bg-accent-muted/40 dark:bg-accent-muted/10 shrink-0">
+                  {getIcon(cat.title)}
+                </div>
+                <h3 className="font-display font-semibold text-base text-text-primary leading-tight">
+                  {cat.title}
+                </h3>
               </div>
-              <h3 className="font-display font-semibold text-base text-text-primary leading-tight">
-                {cat.title}
-              </h3>
-            </div>
 
-            {/* Badges Container */}
-            <div className="flex flex-wrap gap-2 mt-auto">
-              {cat.items.map((skill, index) => (
-                <Badge key={index} variant="subtle" color={cat.color}>
-                  {skill}
-                </Badge>
-              ))}
-            </div>
-          </Card>
-        ))}
+              {/* Badges Container */}
+              <div className="flex flex-wrap gap-2 mt-auto">
+                {cat.items.map((skill, index) => (
+                  <Badge key={index} variant="subtle" color={color}>
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            </Card>
+          );
+        })}
       </div>
       
       {/* Closing Arrow Function Brace */}

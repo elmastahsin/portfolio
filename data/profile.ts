@@ -60,14 +60,7 @@ export interface ProfileData {
     careerFocus: string;
     interests: string[];
   };
-  skills: {
-    backend: string[];
-    frontendMobile: string[];
-    aiMl: string[];
-    databases: string[];
-    devOpsTools: string[];
-    architectureCertifications: string[];
-  };
+  skills: { title: string; items: string[] }[];
   projects: Project[];
   experience: ExperienceItem[];
   education: EducationItem[];
@@ -100,14 +93,14 @@ export const profileData: ProfileData = {
     careerFocus: "Building next-generation infrastructure for collaborative and decentralized machine learning, ensuring safety, efficiency, and high scalability.",
     interests: ["Large Language Models", "Distributed GPU Orchestration", "Vector Databases", "Edge Computing", "Privacy-Preserving AI"]
   },
-  skills: {
-    backend: ["Go", "Python", "Rust", "TypeScript", "Node.js", "gRPC", "FastAPI"],
-    frontendMobile: ["React", "Next.js", "Tailwind CSS", "React Native", "SwiftUI"],
-    aiMl: ["PyTorch", "Hugging Face", "Transformers", "Scikit-Learn", "LangChain", "TensorFlow"],
-    databases: ["PostgreSQL", "Redis", "Pinecone", "MongoDB", "ClickHouse", "SQLite"],
-    devOpsTools: ["Docker", "Kubernetes", "AWS", "GitHub Actions", "Terraform", "Prometheus"],
-    architectureCertifications: ["Microservices", "Event-Driven Systems", "System Design", "AWS Solutions Architect"]
-  },
+  skills: [
+    { title: "Backend Development", items: ["Go", "Python", "Rust", "TypeScript", "Node.js", "gRPC", "FastAPI"] },
+    { title: "Frontend & Mobile", items: ["React", "Next.js", "Tailwind CSS", "React Native", "SwiftUI"] },
+    { title: "AI / Machine Learning", items: ["PyTorch", "Hugging Face", "Transformers", "Scikit-Learn", "LangChain", "TensorFlow"] },
+    { title: "Databases & Cache", items: ["PostgreSQL", "Redis", "Pinecone", "MongoDB", "ClickHouse", "SQLite"] },
+    { title: "DevOps & Tools", items: ["Docker", "Kubernetes", "AWS", "GitHub Actions", "Terraform", "Prometheus"] },
+    { title: "Architecture & Standards", items: ["Microservices", "Event-Driven Systems", "System Design", "AWS Solutions Architect"] }
+  ],
   projects: [
     {
       title: "NeuroFlow Orchestrator",
