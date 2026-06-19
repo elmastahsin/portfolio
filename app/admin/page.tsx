@@ -57,6 +57,14 @@ export default function AdminDashboardPage() {
   const [socialMedium, setSocialMedium] = useState("");
   const [socialScholar, setSocialScholar] = useState("");
   
+  // Skills Form fields
+  const [skillsBackend, setSkillsBackend] = useState("");
+  const [skillsFrontend, setSkillsFrontend] = useState("");
+  const [skillsAiMl, setSkillsAiMl] = useState("");
+  const [skillsDatabases, setSkillsDatabases] = useState("");
+  const [skillsDevOps, setSkillsDevOps] = useState("");
+  const [skillsArchitecture, setSkillsArchitecture] = useState("");
+  
   // Global Notification
   const [notif, setNotif] = useState({ show: false, message: "", type: "success" });
 
@@ -91,6 +99,13 @@ export default function AdminDashboardPage() {
     setSocialTwitter(profile.socials.twitter || "");
     setSocialMedium(profile.socials.medium || "");
     setSocialScholar(profile.socials.scholar || "");
+
+    setSkillsBackend(profile.skills?.backend?.join(", ") || "");
+    setSkillsFrontend(profile.skills?.frontendMobile?.join(", ") || "");
+    setSkillsAiMl(profile.skills?.aiMl?.join(", ") || "");
+    setSkillsDatabases(profile.skills?.databases?.join(", ") || "");
+    setSkillsDevOps(profile.skills?.devOpsTools?.join(", ") || "");
+    setSkillsArchitecture(profile.skills?.architectureCertifications?.join(", ") || "");
   }, [router, profile]);
 
   const loadBlogs = () => {
@@ -274,6 +289,14 @@ export default function AdminDashboardPage() {
         educationSummary: profileEduSummary,
         careerFocus: profileCareerFocus,
         interests
+      },
+      skills: {
+        backend: skillsBackend.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        frontendMobile: skillsFrontend.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        aiMl: skillsAiMl.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        databases: skillsDatabases.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        devOpsTools: skillsDevOps.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+        architectureCertifications: skillsArchitecture.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
       }
     };
 
@@ -819,6 +842,95 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setSocialScholar(e.target.value)}
                         className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
                         placeholder="https://scholar.google.com/citations?..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Skills Section */}
+                <div className="space-y-4 pt-4 border-t border-border-color/60">
+                  <h3 className="font-mono text-xs text-accent-primary font-bold">// 4. Skills & Capabilities (Comma Separated)</h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                        Backend Development
+                      </label>
+                      <input
+                        type="text"
+                        value={skillsBackend}
+                        onChange={(e) => setSkillsBackend(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="e.g. Go, Python, Rust"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                        Frontend & Mobile
+                      </label>
+                      <input
+                        type="text"
+                        value={skillsFrontend}
+                        onChange={(e) => setSkillsFrontend(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="e.g. React, Next.js, React Native"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                        AI / Machine Learning
+                      </label>
+                      <input
+                        type="text"
+                        value={skillsAiMl}
+                        onChange={(e) => setSkillsAiMl(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="e.g. PyTorch, Hugging Face, Transformers"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                        Databases & Cache
+                      </label>
+                      <input
+                        type="text"
+                        value={skillsDatabases}
+                        onChange={(e) => setSkillsDatabases(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="e.g. PostgreSQL, Redis, MongoDB"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                        DevOps & Tools
+                      </label>
+                      <input
+                        type="text"
+                        value={skillsDevOps}
+                        onChange={(e) => setSkillsDevOps(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="e.g. Docker, Kubernetes, AWS"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                        Architecture & Standards
+                      </label>
+                      <input
+                        type="text"
+                        value={skillsArchitecture}
+                        onChange={(e) => setSkillsArchitecture(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="e.g. Microservices, System Design"
                       />
                     </div>
                   </div>
