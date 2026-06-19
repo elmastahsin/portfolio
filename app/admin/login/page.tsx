@@ -1,22 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Card from "@/components/ui/Card";
-import Button from "@/components/ui/Button";
-import { Terminal, ShieldAlert, ArrowLeft } from "lucide-react";
+import { Terminal, ArrowLeft } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const consoleRef = useRef<HTMLDivElement>(null);
+
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loginStep, setLoginStep] = useState<"username" | "password" | "verifying" | "success">("username");
+  const [inputValue, setInputValue] = useState("");
+  
   const [terminalHistory, setTerminalHistory] = useState<string[]>([
     "Initializing secure connection to gatekeeper...",
     "SSH-2.0-OpenSSH_9.0p1 Ubuntu-3ubuntu1.3",
-    "Warning: Unauthorised access is strictly prohibited."
+    "Warning: Unauthorised access is strictly prohibited.",
+    ""
   ]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // If already logged in, skip login screen
@@ -25,29 +27,38 @@ export default function AdminLoginPage() {
     }
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username || !password) {
-      setError("AUTHENTICATION_FAILED: Missing parameters");
-      return;
+  // Focus input on load
+  useEffect(() => {
+    focusInput();
+  }, []);
+
+  // Auto-scroll to bottom of terminal
+  useEffect(() => {
+    if (consoleRef.current) {
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
     }
+  }, [terminalHistory, inputValue, loginStep]);
 
-    setLoading(true);
-    setError("");
-    
-    // Add command to terminal history
-    setTerminalHistory((prev) => [
-      ...prev,
-      `admin@portfolio:~$ login -u ${username} -p **********`
-    ]);
+  const focusInput = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
+  const verifyCredentials = (userVal: string, passVal: string) => {
     setTimeout(() => {
       const expectedUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME || "admin";
       const expectedPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin";
 
-      if (username === expectedUsername && password === expectedPassword) {
-        setTerminalHistory((prev) => [...prev, "Access GRANTED.", "Establishing terminal session..."]);
+      if (userVal === expectedUsername && passVal === expectedPassword) {
+        setTerminalHistory((prev) => [
+          ...prev,
+          "Access GRANTED.",
+          "Establishing secure shell session...",
+          "System loading completed."
+        ]);
         localStorage.setItem("admin_session", "true");
+        setLoginStep("success");
         setTimeout(() => {
           router.push("/admin");
         }, 800);
@@ -55,13 +66,36 @@ export default function AdminLoginPage() {
         setTerminalHistory((prev) => [
           ...prev,
           "ACCESS DENIED: Invalid credential tokens.",
-          "Connection closed."
+          "Connection closed.",
+          ""
         ]);
-        setError("AUTHENTICATION_FAILED: Credentials rejected");
-        setPassword("");
-        setLoading(false);
+        setLoginStep("username");
+        setUsername("");
+        setInputValue("");
       }
     }, 1200);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const value = inputValue;
+
+      if (loginStep === "username") {
+        const trimmedUser = value.trim();
+        if (!trimmedUser) return;
+        
+        setUsername(trimmedUser);
+        setTerminalHistory((prev) => [...prev, `portfolio login: ${trimmedUser}`]);
+        setLoginStep("password");
+        setInputValue("");
+      } else if (loginStep === "password") {
+        setTerminalHistory((prev) => [...prev, `Password: ${"•".repeat(value.length)}`]);
+        setLoginStep("verifying");
+        setInputValue("");
+        verifyCredentials(username, value);
+      }
+    }
   };
 
   return (
@@ -77,15 +111,18 @@ export default function AdminLoginPage() {
 
       <div className="w-full max-w-md animate-fade-in z-10">
         {/* Terminal Window Wrapper */}
-        <div className="rounded-xl border border-border-color bg-bg-secondary shadow-card overflow-hidden">
+        <div
+          onClick={focusInput}
+          className="rounded-xl border border-border-color bg-bg-secondary shadow-card overflow-hidden cursor-text active:border-accent-primary/60 focus-within:border-accent-primary/60 transition-all duration-300"
+        >
           {/* Header Bar */}
-          <div className="flex items-center justify-between px-4 py-3 bg-bg-tertiary border-b border-border-color">
+          <div className="flex items-center justify-between px-4 py-3 bg-bg-tertiary border-b border-border-color select-none">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-full bg-red-500/80" />
               <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
               <span className="w-3 h-3 rounded-full bg-green-500/80" />
             </div>
-            <span className="font-mono text-xs font-semibold text-text-tertiary select-none flex items-center gap-1">
+            <span className="font-mono text-xs font-semibold text-text-tertiary flex items-center gap-1">
               <Terminal size={12} className="text-accent-primary" />
               secure-ssh-login.sh
             </span>
@@ -93,72 +130,73 @@ export default function AdminLoginPage() {
           </div>
 
           {/* Terminal Console View */}
-          <div className="p-5 font-mono text-[11px] bg-bg-primary text-text-secondary h-44 overflow-y-auto space-y-1 border-b border-border-color select-none">
-            {terminalHistory.map((line, idx) => (
-              <p key={idx} className={line.includes("DENIED") || line.includes("FAILED") ? "text-red-500" : line.includes("GRANTED") ? "text-emerald-500 animate-pulse" : ""}>
-                {line}
-              </p>
-            ))}
-            {loading && (
-              <p className="text-accent-primary animate-pulse">// Authenticating client keys...</p>
-            )}
+          <div
+            ref={consoleRef}
+            className="p-6 font-mono text-[11px] bg-bg-primary text-text-secondary h-72 overflow-y-auto relative"
+          >
+            <input
+              ref={inputRef}
+              type={loginStep === "password" ? "password" : "text"}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="absolute w-px h-px opacity-0 pointer-events-none select-none"
+              autoFocus
+              autoComplete="off"
+              disabled={loginStep === "verifying" || loginStep === "success"}
+            />
+
+            <div className="space-y-1.5">
+              {terminalHistory.map((line, idx) => {
+                let colorClass = "";
+                if (line.includes("DENIED")) colorClass = "text-red-500 font-bold";
+                else if (line.includes("GRANTED")) colorClass = "text-emerald-500 font-bold animate-pulse";
+                else if (line.startsWith("Initializing") || line.startsWith("Warning")) colorClass = "text-text-tertiary";
+
+                return (
+                  <p key={idx} className={colorClass}>
+                    {line}
+                  </p>
+                );
+              })}
+
+              {/* Active Prompt Line */}
+              {loginStep === "username" && (
+                <p className="flex items-center">
+                  <span className="text-text-secondary">portfolio login:&nbsp;</span>
+                  <span className="text-text-primary font-bold">{inputValue}</span>
+                  <span className="w-1.5 h-3.5 bg-accent-primary animate-pulse ml-0.5" />
+                </p>
+              )}
+
+              {loginStep === "password" && (
+                <p className="flex items-center">
+                  <span className="text-text-secondary">Password:&nbsp;</span>
+                  <span className="text-text-primary font-bold">{"•".repeat(inputValue.length)}</span>
+                  <span className="w-1.5 h-3.5 bg-accent-primary animate-pulse ml-0.5" />
+                </p>
+              )}
+
+              {loginStep === "verifying" && (
+                <p className="text-accent-primary animate-pulse font-medium">
+                  // Authenticating client credentials...
+                </p>
+              )}
+            </div>
           </div>
-
-          {/* Form inputs */}
-          <form onSubmit={handleLogin} className="p-6 space-y-4">
-            {error && (
-              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs animate-fade-in font-mono">
-                <ShieldAlert size={14} className="shrink-0 mt-0.5" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="user" className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
-                Username
-              </label>
-              <input
-                type="text"
-                id="user"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={loading}
-                className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm font-mono focus:outline-none focus:ring-1 focus:ring-accent-primary focus:border-accent-primary disabled:opacity-50 transition-all duration-200"
-                placeholder="e.g. admin"
-                autoComplete="off"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="pass" className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
-                Access Token / Passphrase
-              </label>
-              <input
-                type="password"
-                id="pass"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm font-mono focus:outline-none focus:ring-1 focus:ring-accent-primary focus:border-accent-primary disabled:opacity-50 transition-all duration-200"
-                placeholder="e.g. admin"
-              />
-            </div>
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full font-mono flex items-center justify-center gap-2 mt-2"
-            >
-              {loading ? "Verifying..." : "Initialize Session"}
-            </Button>
-          </form>
         </div>
 
-        {!process.env.NEXT_PUBLIC_ADMIN_USERNAME && (
-          <p className="text-center font-mono text-[9px] text-text-tertiary mt-4">
-            // Hint: default credentials are Username: <span className="text-accent-primary">admin</span> | Pass: <span className="text-accent-primary">admin</span>
+        {/* Hints and helper text below the terminal */}
+        <div className="flex flex-col gap-1.5 mt-4 text-center">
+          <p className="font-mono text-[9px] text-text-tertiary select-none">
+            // Tap the terminal screen to focus and type. Press Enter to submit.
           </p>
-        )}
+          {!process.env.NEXT_PUBLIC_ADMIN_USERNAME && (
+            <p className="font-mono text-[9px] text-text-tertiary select-none">
+              // Hint: default credentials are Username: <span className="text-accent-primary">admin</span> | Pass: <span className="text-accent-primary">admin</span>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
