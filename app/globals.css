@@ -1,0 +1,250 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg-primary: #f9fafb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-tertiary: #6b7280;
+  --border-color: #e5e7eb;
+  
+  /* Coder Accent Colors: Cyber Emerald Green & Cyan */
+  --accent-primary: #059669; /* Emerald 600 */
+  --accent-secondary: #0891b2; /* Cyan 600 */
+  --accent-muted: #ecfdf5; /* Emerald 50 */
+  
+  --card-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+
+  /* Badge Indigo */
+  --badge-indigo-bg: #f0f4ff;
+  --badge-indigo-text: #4338ca;
+  --badge-indigo-border: rgba(224, 231, 255, 0.5);
+
+  /* Badge Violet */
+  --badge-violet-bg: #f5f3ff;
+  --badge-violet-text: #6d28d9;
+  --badge-violet-border: rgba(237, 233, 254, 0.5);
+
+  /* Badge Green */
+  --badge-green-bg: #ecfdf5;
+  --badge-green-text: #047857;
+  --badge-green-border: rgba(209, 250, 229, 0.5);
+}
+
+html.dark {
+  --bg-primary: #080b11; /* Extreme Dark Charcoal Slate */
+  --bg-secondary: #0d121f; /* Editor Dark Slate */
+  --bg-tertiary: #171f30; /* Terminal dark */
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --border-color: #1e293b;
+  
+  /* Neon Coder Accent Colors */
+  --accent-primary: #10b981; /* Emerald 500 */
+  --accent-secondary: #06b6d4; /* Cyan 500 */
+  --accent-muted: rgba(16, 185, 129, 0.08); /* Faint Emerald Glow */
+  
+  --card-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.4);
+  --card-hover-shadow: 0 12px 24px -4px rgba(5, 150, 105, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.3);
+
+  /* Badge Indigo */
+  --badge-indigo-bg: rgba(30, 27, 75, 0.4);
+  --badge-indigo-text: #a5b4fc;
+  --badge-indigo-border: rgba(49, 46, 129, 0.3);
+
+  /* Badge Violet */
+  --badge-violet-bg: rgba(46, 16, 101, 0.4);
+  --badge-violet-text: #c4b5fd;
+  --badge-violet-border: rgba(76, 29, 149, 0.3);
+
+  /* Badge Green */
+  --badge-green-bg: rgba(6, 78, 59, 0.4);
+  --badge-green-text: #6ee7b7;
+  --badge-green-border: rgba(4, 120, 87, 0.3);
+}
+
+/* Cyan Theme Overrides */
+html.theme-cyan {
+  --accent-primary: #0891b2; /* Cyan 600 */
+  --accent-secondary: #4f46e5; /* Indigo 600 */
+  --accent-muted: #ecfeff; /* Cyan 50 */
+}
+html.dark.theme-cyan {
+  --accent-primary: #06b6d4; /* Cyan 500 */
+  --accent-secondary: #6366f1; /* Indigo 500 */
+  --accent-muted: rgba(6, 182, 212, 0.08);
+}
+
+/* Amber/Orange Theme Overrides */
+html.theme-amber {
+  --accent-primary: #d97706; /* Amber 600 */
+  --accent-secondary: #ea580c; /* Orange 600 */
+  --accent-muted: #fffbeb; /* Amber 50 */
+}
+html.dark.theme-amber {
+  --accent-primary: #f59e0b; /* Amber 500 */
+  --accent-secondary: #f97316; /* Orange 500 */
+  --accent-muted: rgba(245, 158, 11, 0.08);
+}
+
+/* Fuchsia/Purple Theme Overrides */
+html.theme-fuchsia {
+  --accent-primary: #c026d3; /* Fuchsia 600 */
+  --accent-secondary: #7c3aed; /* Violet 600 */
+  --accent-muted: #fdf4ff; /* Fuchsia 50 */
+}
+html.dark.theme-fuchsia {
+  --accent-primary: #d946ef; /* Fuchsia 500 */
+  --accent-secondary: #8b5cf6; /* Violet 500 */
+  --accent-muted: rgba(217, 70, 239, 0.08);
+}
+
+/* Red Theme Overrides */
+html.theme-red {
+  --accent-primary: #dc2626; /* Red 600 */
+  --accent-secondary: #ea580c; /* Orange 600 */
+  --accent-muted: #fef2f2; /* Red 50 */
+}
+html.dark.theme-red {
+  --accent-primary: #ef4444; /* Red 500 */
+  --accent-secondary: #f97316; /* Orange 500 */
+  --accent-muted: rgba(239, 68, 68, 0.08);
+}
+
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-border-color: var(--border-color);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-accent-muted: var(--accent-muted);
+  --shadow-card: var(--card-shadow);
+  --shadow-card-hover: var(--card-hover-shadow);
+  
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains), monospace;
+  --font-display: var(--font-jetbrains), monospace;
+
+  /* Custom badge theme colors */
+  --color-badge-indigo-bg: var(--badge-indigo-bg);
+  --color-badge-indigo-text: var(--badge-indigo-text);
+  --color-badge-indigo-border: var(--badge-indigo-border);
+  
+  --color-badge-violet-bg: var(--badge-violet-bg);
+  --color-badge-violet-text: var(--badge-violet-text);
+  --color-badge-violet-border: var(--badge-violet-border);
+
+  --color-badge-green-bg: var(--badge-green-bg);
+  --color-badge-green-text: var(--badge-green-text);
+  --color-badge-green-border: var(--badge-green-border);
+}
+
+/* Base resets & transitions */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  scroll-behavior: smooth;
+}
+
+/* Cyber Engineering Grid Background */
+.cyber-grid {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(156, 163, 175, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(156, 163, 175, 0.03) 1px, transparent 1px);
+}
+
+html.dark .cyber-grid {
+  background-image: 
+    linear-gradient(to right, rgba(30, 41, 59, 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(30, 41, 59, 0.2) 1px, transparent 1px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* Grid & Utilities */
+.hero-gradient {
+  background: radial-gradient(circle at 50% 50%, var(--accent-muted) 0%, transparent 80%);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Code Editor Lines Accent */
+.code-border {
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+.code-border::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
