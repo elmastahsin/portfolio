@@ -13,7 +13,7 @@ interface CommandLog {
 export default function Hero() {
   const { profile } = useProfile();
   const { socials } = profile;
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const historyContainerRef = useRef<HTMLDivElement>(null);
   
   // Terminal state
   const [input, setInput] = useState("");
@@ -21,8 +21,8 @@ export default function Hero() {
 
   // Auto-scroll terminal history to bottom
   useEffect(() => {
-    if (terminalEndRef.current) {
-      terminalEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (historyContainerRef.current) {
+      historyContainerRef.current.scrollTop = historyContainerRef.current.scrollHeight;
     }
   }, [history]);
 
@@ -280,7 +280,10 @@ export default function Hero() {
             </div>
 
             {/* Terminal History */}
-            <div className="p-4 bg-bg-primary h-60 overflow-y-auto space-y-3">
+            <div 
+              ref={historyContainerRef}
+              className="p-4 bg-bg-primary h-60 overflow-y-auto space-y-3"
+            >
               {history.map((log, idx) => (
                 <div key={idx} className="space-y-1.5">
                   <p className="font-mono text-[10px] text-text-primary">
@@ -289,7 +292,6 @@ export default function Hero() {
                   <div className="pl-3">{log.output}</div>
                 </div>
               ))}
-              <div ref={terminalEndRef} />
             </div>
 
             {/* Command input prompt */}
