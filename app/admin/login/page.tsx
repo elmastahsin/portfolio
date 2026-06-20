@@ -58,6 +58,7 @@ export default function AdminLoginPage() {
           "System loading completed."
         ]);
         localStorage.setItem("admin_session", "true");
+        localStorage.setItem("admin_token", passVal);
         setLoginStep("success");
         setTimeout(() => {
           router.push("/admin");

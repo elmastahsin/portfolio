@@ -11,14 +11,33 @@ export default function BlogSection() {
   const [blogs, setBlogs] = useState<BlogPost[]>(initialBlogs);
 
   useEffect(() => {
-    // Load custom blogs written in the admin panel
-    const customBlogsStr = localStorage.getItem("custom_blogs");
-    if (customBlogsStr) {
-      try {
-        const customBlogs = JSON.parse(customBlogsStr) as BlogPost[];
-        setBlogs([...customBlogs, ...initialBlogs]);
-      } catch (err) {
-        console.error("Failed to parse custom blogs", err);
+    // 1. Fetch from database API
+    fetch("/api/blogs")
+      .then((res) => {
+        if (!res.ok) throw new Error("Database fetch returned status " + res.status);
+        return res.json();
+      })
+      .then((data: BlogPost[]) => {
+        if (data && data.length > 0) {
+          setBlogs(data);
+        } else {
+          loadFallback();
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not fetch blogs from Supabase, checking local fallback.", err);
+        loadFallback();
+      });
+
+    function loadFallback() {
+      const customBlogsStr = localStorage.getItem("custom_blogs");
+      if (customBlogsStr) {
+        try {
+          const customBlogs = JSON.parse(customBlogsStr) as BlogPost[];
+          setBlogs([...customBlogs, ...initialBlogs]);
+        } catch (err) {
+          console.error("Failed to parse custom blogs", err);
+        }
       }
     }
   }, []);

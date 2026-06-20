@@ -16,25 +16,46 @@ export default function BlogDetailPage() {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    // 1. Check initialBlogs
-    const foundStatic = initialBlogs.find((b) => b.slug === slug);
-    if (foundStatic) {
-      setPost(foundStatic);
-      return;
-    }
-
-    // 2. Check localStorage custom blogs
-    const customBlogsStr = localStorage.getItem("custom_blogs");
-    if (customBlogsStr) {
-      try {
-        const customBlogs = JSON.parse(customBlogsStr) as BlogPost[];
-        const foundCustom = customBlogs.find((b) => b.slug === slug);
-        if (foundCustom) {
-          setPost(foundCustom);
-          return;
+    // 1. Try to fetch all blogs from the Supabase API first
+    fetch("/api/blogs")
+      .then((res) => {
+        if (!res.ok) throw new Error("API error status " + res.status);
+        return res.json();
+      })
+      .then((blogs: BlogPost[]) => {
+        const found = blogs.find((b) => b.slug === slug);
+        if (found) {
+          setPost(found);
+        } else {
+          loadFallback();
         }
-      } catch (err) {
-        console.error("Failed to parse custom blogs", err);
+      })
+      .catch((err) => {
+        console.warn("Could not load blogs from Supabase, checking local/static fallback.", err);
+        loadFallback();
+      });
+
+    function loadFallback() {
+      // Check initialBlogs
+      const foundStatic = initialBlogs.find((b) => b.slug === slug);
+      if (foundStatic) {
+        setPost(foundStatic);
+        return;
+      }
+
+      // Check localStorage custom blogs
+      const customBlogsStr = localStorage.getItem("custom_blogs");
+      if (customBlogsStr) {
+        try {
+          const customBlogs = JSON.parse(customBlogsStr) as BlogPost[];
+          const foundCustom = customBlogs.find((b) => b.slug === slug);
+          if (foundCustom) {
+            setPost(foundCustom);
+            return;
+          }
+        } catch (err) {
+          console.error("Failed to parse custom blogs", err);
+        }
       }
     }
   }, [slug]);

@@ -113,18 +113,27 @@ export default function AdminDashboardPage() {
     })));
   }, [router, profile]);
 
-  const loadBlogs = () => {
-    const local = localStorage.getItem("custom_blogs");
-    let parsedCustom: BlogPost[] = [];
-    if (local) {
-      try {
-        parsedCustom = JSON.parse(local) as BlogPost[];
-        setCustomBlogs(parsedCustom);
-      } catch (e) {
-        console.error(e);
+  const loadBlogs = async () => {
+    try {
+      const res = await fetch("/api/blogs");
+      if (!res.ok) throw new Error("Failed to fetch blogs");
+      const data: BlogPost[] = await res.json();
+      setBlogs(data);
+      setCustomBlogs(data.filter(b => !b.id.startsWith("post-")));
+    } catch (e) {
+      console.error("Could not load blogs from Supabase, loading fallback static mock articles.", e);
+      const local = localStorage.getItem("custom_blogs");
+      let parsedCustom: BlogPost[] = [];
+      if (local) {
+        try {
+          parsedCustom = JSON.parse(local) as BlogPost[];
+          setCustomBlogs(parsedCustom);
+        } catch (err) {
+          console.error(err);
+        }
       }
+      setBlogs([...parsedCustom, ...initialBlogs]);
     }
-    setBlogs([...parsedCustom, ...initialBlogs]);
   };
 
   const handleTitleChange = (val: string) => {
@@ -159,7 +168,7 @@ export default function AdminDashboardPage() {
   };
 
   // Save/Create Blog Post
-  const handleSavePost = (e: React.FormEvent) => {
+  const handleSavePost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !slug || !summary || !content) {
       triggerNotification("Fields with '*' are mandatory", "error");
@@ -177,52 +186,72 @@ export default function AdminDashboardPage() {
       day: "numeric"
     });
 
-    let updatedCustom: BlogPost[] = [...customBlogs];
+    const isCreate = editorMode === "create";
+    const postId = isCreate ? `custom-post-${Date.now()}` : (editingId as string);
 
-    if (editorMode === "create") {
+    if (isCreate) {
       const isDuplicate = blogs.some((b) => b.slug === slug);
       if (isDuplicate) {
         triggerNotification("ERROR: Slug already exists in database", "error");
         return;
       }
-
-      const newPost: BlogPost = {
-        id: `custom-post-${Date.now()}`,
-        slug,
-        title,
-        summary,
-        content,
-        category,
-        readTime,
-        date: formattedDate,
-        author: profileName || "Developer",
-        tags
-      };
-
-      updatedCustom = [newPost, ...updatedCustom];
-      triggerNotification("Success: Post published successfully!");
-    } else {
-      updatedCustom = updatedCustom.map((post) => {
-        if (post.id === editingId) {
-          return {
-            ...post,
-            slug,
-            title,
-            summary,
-            content,
-            category,
-            readTime,
-            tags
-          };
-        }
-        return post;
-      });
-      triggerNotification("Success: Post edited successfully!");
     }
 
-    localStorage.setItem("custom_blogs", JSON.stringify(updatedCustom));
-    loadBlogs();
-    resetForm();
+    const blogPayload: BlogPost = {
+      id: postId,
+      slug,
+      title,
+      summary,
+      content,
+      category,
+      readTime,
+      date: isCreate ? formattedDate : (blogs.find(b => b.id === postId)?.date || formattedDate),
+      author: profileName || "Developer",
+      tags
+    };
+
+    try {
+      const token = localStorage.getItem("admin_token") || "";
+      const res = await fetch("/api/blogs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token
+        },
+        body: JSON.stringify(blogPayload)
+      });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      triggerNotification(isCreate ? "Success: Post published successfully!" : "Success: Post edited successfully!");
+      
+      // Update local storage backup
+      let updatedCustom = [...customBlogs];
+      if (isCreate) {
+        updatedCustom = [blogPayload, ...updatedCustom];
+      } else {
+        updatedCustom = updatedCustom.map(b => b.id === postId ? blogPayload : b);
+      }
+      localStorage.setItem("custom_blogs", JSON.stringify(updatedCustom));
+      
+      loadBlogs();
+      resetForm();
+    } catch (err: any) {
+      console.error("Database save failed, writing to local storage fallback only.", err);
+      triggerNotification("DB_SAVE_FAILED, fallback to local storage active.", "error");
+
+      let updatedCustom = [...customBlogs];
+      if (isCreate) {
+        updatedCustom = [blogPayload, ...updatedCustom];
+      } else {
+        updatedCustom = updatedCustom.map(b => b.id === postId ? blogPayload : b);
+      }
+      localStorage.setItem("custom_blogs", JSON.stringify(updatedCustom));
+      loadBlogs();
+      resetForm();
+    }
   };
 
   // Open Edit blog panel
@@ -243,15 +272,34 @@ export default function AdminDashboardPage() {
   };
 
   // Delete Blog Post
-  const handleDeletePost = (id: string) => {
+  const handleDeletePost = async (id: string) => {
     if (id.startsWith("post-")) {
       triggerNotification("READONLY: Cannot delete static mock articles", "error");
       return;
     }
     if (confirm("Are you sure you want to delete this article?")) {
+      try {
+        const token = localStorage.getItem("admin_token") || "";
+        const res = await fetch(`/api/blogs?id=${id}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": token
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+
+        triggerNotification("Success: Post deleted successfully");
+      } catch (err) {
+        console.error("Failed to delete from DB", err);
+        triggerNotification("DB delete failed, updating local storage fallback.", "error");
+      }
+
       const filtered = customBlogs.filter((post) => post.id !== id);
       localStorage.setItem("custom_blogs", JSON.stringify(filtered));
-      triggerNotification("Success: Post deleted successfully");
+      
       loadBlogs();
       if (editingId === id) resetForm();
     }
