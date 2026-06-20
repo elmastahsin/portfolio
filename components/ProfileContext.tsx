@@ -10,54 +10,22 @@ interface ProfileContextType {
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
-export function ProfileProvider({ children }: { children: React.ReactNode }) {
-  const [profile, setProfile] = useState<ProfileData>(defaultProfile);
+interface ProfileProviderProps {
+  children: React.ReactNode;
+  initialProfile: ProfileData;
+}
+
+export function ProfileProvider({ children, initialProfile }: ProfileProviderProps) {
+  const [profile, setProfile] = useState<ProfileData>(initialProfile);
 
   useEffect(() => {
-    // 1. Fetch from Supabase via API
-    fetch("/api/profile")
-      .then((res) => {
-        if (!res.ok) throw new Error("Database fetch returned status " + res.status);
-        return res.json();
-      })
-      .then((dbProfile) => {
-        if (dbProfile && dbProfile.name) {
-          // Map database structure to ProfileData
-          setProfile({
-            name: dbProfile.name,
-            title: dbProfile.title,
-            tagline: dbProfile.tagline,
-            location: dbProfile.location,
-            email: dbProfile.email,
-            cvUrl: dbProfile.cv_url || dbProfile.cvUrl || "#",
-            profileImage: dbProfile.profile_image || dbProfile.profileImage || "/images/profile.jpg",
-            themeColor: dbProfile.theme_color || dbProfile.themeColor || "emerald",
-            socials: dbProfile.socials || {},
-            about: dbProfile.about || {},
-            skills: dbProfile.skills || [],
-            projects: dbProfile.projects || defaultProfile.projects,
-            experience: dbProfile.experience || defaultProfile.experience,
-            education: dbProfile.education || defaultProfile.education,
-            certifications: dbProfile.certifications || defaultProfile.certifications,
-            languages: dbProfile.languages || defaultProfile.languages
-          });
-        } else {
-          loadFromLocalStorage();
-        }
-      })
-      .catch((err) => {
-        console.warn("Could not fetch profile from Supabase, falling back to local storage.", err);
-        loadFromLocalStorage();
-      });
-
-    function loadFromLocalStorage() {
-      const saved = localStorage.getItem("custom_profile");
-      if (saved) {
-        try {
-          setProfile(JSON.parse(saved));
-        } catch (err) {
-          console.error("Failed to parse custom profile data", err);
-        }
+    // Local storage fallback check (for quick local development shifts)
+    const saved = localStorage.getItem("custom_profile");
+    if (saved) {
+      try {
+        setProfile(JSON.parse(saved));
+      } catch (err) {
+        console.error("Failed to parse custom profile data", err);
       }
     }
   }, []);
