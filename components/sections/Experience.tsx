@@ -3,11 +3,15 @@
 import React from "react";
 import Card from "../ui/Card";
 import { useProfile } from "../ProfileContext";
+import { useLanguage } from "../LanguageContext";
+import { translations } from "@/data/profile";
 import { Award, Briefcase, Calendar, MapPin } from "lucide-react";
 
 export default function Experience() {
   const { profile } = useProfile();
   const { experience } = profile;
+  const { language } = useLanguage();
+  const tLabels = translations[language].labels;
 
   return (
     <section id="experience" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
@@ -68,7 +72,7 @@ export default function Experience() {
                 <div className="p-4 rounded-xl bg-accent-muted/40 dark:bg-accent-muted/10 border border-accent-primary/20">
                   <h4 className="font-display font-semibold text-xs text-accent-primary uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                     <Award size={14} />
-                    Key Measurable Achievements
+                    {tLabels.keyAchievements}
                   </h4>
                   <ul className="space-y-1.5 text-xs text-text-primary">
                     {item.keyAchievements.map((ach, index) => (
@@ -90,3 +94,4 @@ export default function Experience() {
     </section>
   );
 }
+

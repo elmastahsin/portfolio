@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeContext";
 import { ProfileProvider } from "@/components/ProfileContext";
+import { LanguageProvider } from "@/components/LanguageContext";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { ProfileData, profileData as defaultProfile } from "@/data/profile";
 
@@ -116,12 +117,15 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary antialiased cyber-grid">
-        <ThemeProvider>
-          <ProfileProvider initialProfile={initialProfile}>
-            {children}
-          </ProfileProvider>
-        </ThemeProvider>
+        <LanguageProvider>
+          <ThemeProvider>
+            <ProfileProvider initialProfile={initialProfile}>
+              {children}
+            </ProfileProvider>
+          </ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
 }
+

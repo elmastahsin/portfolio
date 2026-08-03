@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import Button from "../ui/Button";
 import { Github, Linkedin, Mail, Twitter, BookOpen, GraduationCap, ArrowDown, Terminal } from "lucide-react";
 import { useProfile } from "../ProfileContext";
+import { useLanguage } from "../LanguageContext";
+import { translations } from "@/data/profile";
 
 interface CommandLog {
   cmd: string;
@@ -13,6 +15,8 @@ interface CommandLog {
 export default function Hero() {
   const { profile } = useProfile();
   const { socials } = profile;
+  const { language } = useLanguage();
+  const t = translations[language].buttons;
   const historyContainerRef = useRef<HTMLDivElement>(null);
   
   // Terminal state
@@ -48,15 +52,15 @@ export default function Hero() {
               <p><span className="text-accent-primary">Host</span>: Web-Terminal Simulator</p>
               <p><span className="text-accent-primary">Kernel</span>: Next.js App Router</p>
               <p><span className="text-accent-primary">Shell</span>: zsh v5.9</p>
-              <p><span className="text-accent-primary">Status</span>: Optimizing distributed nodes...</p>
+              <p><span className="text-accent-primary">Status</span>: {language === "tr" ? "Mikroservisler aktif..." : "Optimizing distributed nodes..."}</p>
               <p><span className="text-accent-primary">Focus</span>: {profile.title}</p>
-              <p className="text-text-tertiary pt-1">// Type 'help' to explore additional paths.</p>
+              <p className="text-text-tertiary pt-1">// {language === "tr" ? "Komutlar için 'help' yazın." : "Type 'help' to explore additional paths."}</p>
             </div>
           </div>
         )
       }
     ]);
-  }, [profile]);
+  }, [profile, language]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -80,13 +84,13 @@ export default function Hero() {
       case "help":
         response = (
           <div className="space-y-1 font-mono text-[10px] text-text-secondary">
-            <p className="text-text-primary font-semibold">// Available CLI utility commands:</p>
-            <p><span className="text-accent-primary">neofetch</span> - Output system specs and developer information.</p>
-            <p><span className="text-accent-primary">about</span>    - Display professional profile summary.</p>
-            <p><span className="text-accent-primary">skills</span>   - List primary technical stack competencies.</p>
-            <p><span className="text-accent-primary">projects</span> - Output brief summaries of featured projects.</p>
-            <p><span className="text-accent-primary">socials</span>  - Show interactive URL shortcuts to profiles.</p>
-            <p><span className="text-accent-primary">clear</span>    - Wipe the screen logs memory buffer.</p>
+            <p className="text-text-primary font-semibold">// CLI utility commands:</p>
+            <p><span className="text-accent-primary">neofetch</span> - System specs & info.</p>
+            <p><span className="text-accent-primary">about</span>    - Display summary bio.</p>
+            <p><span className="text-accent-primary">skills</span>   - List primary technical stack.</p>
+            <p><span className="text-accent-primary">projects</span> - Output featured projects.</p>
+            <p><span className="text-accent-primary">socials</span>  - Show social URLs.</p>
+            <p><span className="text-accent-primary">clear</span>    - Clear terminal logs.</p>
           </div>
         );
         break;
@@ -103,16 +107,15 @@ export default function Hero() {
           const categoriesList = Array.isArray(rawSkills) 
             ? rawSkills 
             : [
-                { title: "Backend Development", items: (rawSkills as any)?.backend || [] },
-                { title: "AI / Machine Learning", items: (rawSkills as any)?.aiMl || [] },
-                { title: "Databases & Cache", items: (rawSkills as any)?.databases || [] }
+                { title: "Backend", items: (rawSkills as any)?.backend || [] },
+                { title: "Databases", items: (rawSkills as any)?.databases || [] }
               ];
           response = (
             <div className="font-mono text-[10px] text-text-secondary space-y-1">
               {categoriesList.slice(0, 4).map((c, i) => (
                 <p key={i}>
                   <span className="text-accent-secondary font-bold">
-                    {c.title.replace(" Development", "").replace(" & Tools", "").replace(" & Standards", "")}
+                    {c.title}
                   </span>: {c.items.slice(0, 4).join(", ")}
                 </p>
               ))}
@@ -165,11 +168,12 @@ export default function Hero() {
         <div className="lg:col-span-7 space-y-6 text-left">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-accent-muted/40 dark:bg-accent-muted/10 text-accent-primary border border-accent-primary/20">
             <span className="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse" />
-            Available for new opportunities
+            {language === "tr" ? "Yeni fırsatlara açık" : "Available for new opportunities"}
           </span>
 
           <h1 className="font-display font-bold text-4xl md:text-6xl tracking-tight text-text-primary leading-tight">
-            Hi, I'm <span className="text-gradient">{profile.name}</span>
+            {language === "tr" ? "Merhaba, Ben " : "Hi, I'm "}
+            <span className="text-gradient">{profile.name}</span>
           </h1>
 
           <h2 className="font-display font-medium text-lg md:text-2xl text-text-secondary tracking-wide font-mono">
@@ -183,15 +187,16 @@ export default function Hero() {
           {/* Action CTAs */}
           <div className="flex flex-wrap items-center gap-3.5 pt-2">
             <Button variant="primary" onClick={() => scrollToSection("projects")}>
-              View Projects
+              {language === "tr" ? "Projeleri İncele" : "View Projects"}
             </Button>
             <Button variant="outline" href={profile.cvUrl} external>
-              Download CV
+              {t.downloadCv}
             </Button>
             <Button variant="secondary" onClick={() => scrollToSection("contact")}>
-              Contact Me
+              {t.getInTouch}
             </Button>
           </div>
+
 
           {/* Social icons */}
           <div className="flex items-center gap-5 pt-3">

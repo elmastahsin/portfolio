@@ -2,11 +2,13 @@
 
 import React from "react";
 import { useProfile } from "../ProfileContext";
+import { useLanguage } from "../LanguageContext";
 import { Github, Linkedin, Mail, Twitter, BookOpen, GraduationCap } from "lucide-react";
 
 export default function Footer() {
   const { profile } = useProfile();
   const { socials } = profile;
+  const { language } = useLanguage();
   const currentYear = new Date().getFullYear();
 
   const scrollToTop = () => {
@@ -29,7 +31,7 @@ export default function Footer() {
             <span className="text-accent-primary">.</span>
           </button>
           <p className="text-xs text-text-tertiary font-normal">
-            &copy; {currentYear} {profile.name}. All rights reserved.
+            &copy; {currentYear} {profile.name}. {language === "tr" ? "Tüm hakları saklıdır." : "All rights reserved."}
           </p>
         </div>
 
@@ -104,3 +106,4 @@ export default function Footer() {
     </footer>
   );
 }
+

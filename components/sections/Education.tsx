@@ -4,11 +4,13 @@ import React from "react";
 import Card from "../ui/Card";
 import Badge from "../ui/Badge";
 import { useProfile } from "../ProfileContext";
+import { useLanguage } from "../LanguageContext";
 import { GraduationCap, Calendar, MapPin, BookOpen, Lightbulb } from "lucide-react";
 
 export default function Education() {
   const { profile } = useProfile();
   const { education } = profile;
+  const { language } = useLanguage();
 
   return (
     <section id="education" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
@@ -36,7 +38,7 @@ export default function Education() {
                       {item.university}
                     </h3>
                     <p className="text-sm font-semibold text-accent-primary mt-1">
-                      {item.degree} in {item.department}
+                      {item.degree} — {item.department}
                     </p>
                   </div>
                 </div>
@@ -59,7 +61,9 @@ export default function Education() {
                 <div className="flex items-start gap-2.5 p-3 rounded-lg bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/15 text-text-secondary text-xs mb-5 font-normal leading-relaxed">
                   <Lightbulb size={16} className="text-accent-primary shrink-0 mt-0.5" />
                   <span>
-                    <span className="font-semibold text-text-primary">Focus:</span> {item.focus}
+                    <span className="font-semibold text-text-primary">
+                      {language === "tr" ? "Odak Alanı:" : "Focus:"}
+                    </span> {item.focus}
                   </span>
                 </div>
               )}
@@ -69,7 +73,7 @@ export default function Education() {
                 <div>
                   <h4 className="font-display font-semibold text-xs text-text-tertiary uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                     <BookOpen size={13} />
-                    Relevant Coursework
+                    {language === "tr" ? "Alınan Dersler" : "Relevant Coursework"}
                   </h4>
                   <div className="flex flex-wrap gap-1.5">
                     {item.coursework.map((course, index) => (
@@ -90,3 +94,4 @@ export default function Education() {
     </section>
   );
 }
+

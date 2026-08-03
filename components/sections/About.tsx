@@ -3,17 +3,21 @@
 import React from "react";
 import Card from "../ui/Card";
 import { useProfile } from "../ProfileContext";
+import { useLanguage } from "../LanguageContext";
+import { translations } from "@/data/profile";
 import { Briefcase, GraduationCap, MapPin, Compass, CheckCircle } from "lucide-react";
 
 export default function About() {
   const { profile } = useProfile();
   const { about, location } = profile;
+  const { language } = useLanguage();
+  const tLabels = translations[language].labels;
 
   const details = [
-    { icon: <Briefcase className="text-accent-primary" size={18} />, label: "Current Role", value: about.currentRole },
-    { icon: <GraduationCap className="text-accent-primary" size={18} />, label: "Education", value: about.educationSummary },
-    { icon: <Compass className="text-accent-primary" size={18} />, label: "Career Focus", value: about.careerFocus },
-    { icon: <MapPin className="text-accent-primary" size={18} />, label: "Location", value: location },
+    { icon: <Briefcase className="text-accent-primary" size={18} />, label: tLabels.currentRole, value: about.currentRole },
+    { icon: <GraduationCap className="text-accent-primary" size={18} />, label: tLabels.educationSummary, value: about.educationSummary },
+    { icon: <Compass className="text-accent-primary" size={18} />, label: tLabels.careerFocus, value: about.careerFocus },
+    { icon: <MapPin className="text-accent-primary" size={18} />, label: language === "tr" ? "Konum" : "Location", value: location },
   ];
 
   return (
@@ -67,11 +71,11 @@ export default function About() {
               {`{
   "developer": {
     "name": "${profile.name}",
-    "type": "AI & Systems Specialist",
-    "stack": ["Golang", "Rust", "PyTorch"],
-    "methods": ["Distributed Systems", "Federated LLMs"],
-    "passion": "Building low-latency architectures",
-    "running_mode": "optimize_all_the_things"
+    "role": "Java & Training Delivery",
+    "stack": ["Java", "Spring Boot", "Kafka"],
+    "methods": ["Microservices", "Docker", "AWS"],
+    "focus": "Enterprise Backend Systems",
+    "mode": "active_development"
   }
 }`}
             </pre>
@@ -81,7 +85,7 @@ export default function About() {
           <Card hoverEffect={false} glassmorphism={true} className="p-6">
             <h3 className="font-display font-semibold text-lg text-text-primary mb-4 flex items-center gap-2">
               <CheckCircle size={18} className="text-accent-primary" />
-              Main Interests
+              {tLabels.interests}
             </h3>
             <div className="flex flex-wrap gap-2.5">
               {about.interests.map((interest, index) => (
@@ -102,3 +106,4 @@ export default function About() {
     </section>
   );
 }
+

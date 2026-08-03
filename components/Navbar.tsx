@@ -2,23 +2,41 @@
 
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X, Globe } from "lucide-react";
 import { useProfile } from "./ProfileContext";
-
-const NAV_ITEMS = [
-  { label: "Home", id: "home" },
-  { label: "About", id: "about" },
-  { label: "Skills", id: "skills" },
-  { label: "Projects", id: "projects" },
-  { label: "Experience", id: "experience" },
-  { label: "Education", id: "education" },
-  { label: "Blog", id: "blog" },
-  { label: "Contact", id: "contact" }
-];
+import { useLanguage } from "./LanguageContext";
+import { translations } from "@/data/profile";
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { profile } = useProfile();
+  const { language, toggleLanguage } = useLanguage();
+  const t = translations[language].nav;
+
+  const [hasBlogs, setHasBlogs] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/blogs")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (data && data.length > 0) {
+          setHasBlogs(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const navItems = [
+    { label: language === "tr" ? "Ana Sayfa" : "Home", id: "home" },
+    { label: t.about, id: "about" },
+    { label: t.skills, id: "skills" },
+    { label: t.projects, id: "projects" },
+    { label: t.experience, id: "experience" },
+    { label: t.education, id: "education" },
+    ...(hasBlogs ? [{ label: t.blog, id: "blog" }] : []),
+    { label: t.contact, id: "contact" }
+  ];
+
   const [activeSection, setActiveSection] = useState("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -31,7 +49,7 @@ export default function Navbar() {
       // Section tracking
       const scrollPosition = window.scrollY + 100; // Offset for navbar height
       
-      for (const item of NAV_ITEMS) {
+      for (const item of navItems) {
         const element = document.getElementById(item.id);
         if (element) {
           const offsetTop = element.offsetTop;
@@ -45,7 +63,7 @@ export default function Navbar() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [language]);
 
   const scrollToSection = (id: string) => {
     setIsMobileMenuOpen(false);
@@ -86,7 +104,7 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
@@ -100,11 +118,21 @@ export default function Navbar() {
             </button>
           ))}
 
+          {/* Language Switcher */}
+          <button
+            onClick={toggleLanguage}
+            aria-label="Toggle Language"
+            className="flex items-center space-x-1 px-3 py-1.5 ml-2 rounded-lg text-xs font-bold border border-border-color text-text-secondary hover:text-accent-primary hover:border-accent-primary transition-all duration-200 cursor-pointer active:scale-95"
+          >
+            <Globe size={14} />
+            <span>{language.toUpperCase()}</span>
+          </button>
+
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="p-2 ml-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all duration-200 cursor-pointer active:scale-90"
+            className="p-2 ml-1 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all duration-200 cursor-pointer active:scale-90"
           >
             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
@@ -112,6 +140,16 @@ export default function Navbar() {
 
         {/* Mobile Navbar Buttons */}
         <div className="flex items-center space-x-2 md:hidden">
+          {/* Language Switcher */}
+          <button
+            onClick={toggleLanguage}
+            aria-label="Toggle Language"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold border border-border-color text-text-secondary hover:text-accent-primary transition-all"
+          >
+            <Globe size={14} />
+            <span>{language.toUpperCase()}</span>
+          </button>
+
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
@@ -136,7 +174,7 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-bg-secondary border-b border-border-color shadow-lg animate-fade-in">
           <nav className="flex flex-col p-4 space-y-1">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
@@ -155,3 +193,4 @@ export default function Navbar() {
     </header>
   );
 }
+

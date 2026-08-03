@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { ProfileData, profileData as defaultProfile } from "@/data/profile";
+import { ProfileData, profileDataEn, profileDataTr } from "@/data/profile";
+import { useLanguage } from "@/components/LanguageContext";
 
 interface ProfileContextType {
   profile: ProfileData;
@@ -16,19 +17,24 @@ interface ProfileProviderProps {
 }
 
 export function ProfileProvider({ children, initialProfile }: ProfileProviderProps) {
-  const [profile, setProfile] = useState<ProfileData>(initialProfile);
+  const { language } = useLanguage();
+  const [profile, setProfile] = useState<ProfileData>(
+    language === "tr" ? profileDataTr : profileDataEn
+  );
 
   useEffect(() => {
-    // Local storage fallback check (for quick local development shifts)
     const saved = localStorage.getItem("custom_profile");
     if (saved) {
       try {
         setProfile(JSON.parse(saved));
+        return;
       } catch (err) {
         console.error("Failed to parse custom profile data", err);
       }
     }
-  }, []);
+    // Set profile based on active language
+    setProfile(language === "tr" ? profileDataTr : profileDataEn);
+  }, [language]);
 
   useEffect(() => {
     if (!profile) return;
@@ -85,3 +91,4 @@ export function useProfile() {
   }
   return context;
 }
+

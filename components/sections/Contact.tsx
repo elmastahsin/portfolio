@@ -4,10 +4,14 @@ import React, { useState } from "react";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { useProfile } from "../ProfileContext";
-import { Mail, Linkedin, Github, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { useLanguage } from "../LanguageContext";
+import { translations } from "@/data/profile";
+import { Mail, Linkedin, Send, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function Contact() {
   const { profile } = useProfile();
+  const { language } = useLanguage();
+  const tButtons = translations[language].buttons;
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
@@ -49,10 +53,12 @@ export default function Contact() {
         {/* Left Column: Info & Links */}
         <div className="lg:col-span-5 space-y-6">
           <h3 className="font-display font-bold text-2xl text-text-primary mb-3 font-mono">
-            Let's build something together
+            {language === "tr" ? "Birlikte Yeni Projeler Geliştirelim" : "Let's build something together"}
           </h3>
           <p className="text-sm md:text-base text-text-secondary leading-relaxed font-normal">
-            Whether you want to discuss a software engineering role, an AI/ML research opportunity, backend system architectures, or just want to connect, feel free to drop me a message.
+            {language === "tr" 
+              ? "Yazılım geliştirme rolleri, backend mikroservis mimarileri, eğitim delivery süreçleri veya projeleriniz hakkında görüşmek için mesaj bırakabilirsiniz."
+              : "Whether you want to discuss a software engineering role, backend system architectures, training programs, or just want to connect, feel free to drop me a message."}
           </p>
 
           {/* Contact Details */}
@@ -66,7 +72,7 @@ export default function Contact() {
               </div>
               <div>
                 <span className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-0.5">
-                  Email Me Direct
+                  {language === "tr" ? "E-Posta Adresi" : "Email Me Direct"}
                 </span>
                 <span className="text-sm font-semibold text-text-primary">
                   {profile.email}
@@ -86,7 +92,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <span className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-0.5">
-                    Connect on LinkedIn
+                    {language === "tr" ? "LinkedIn Profili" : "Connect on LinkedIn"}
                   </span>
                   <span className="text-sm font-semibold text-text-primary truncate max-w-[180px] block">
                     {profile.socials.linkedin.replace("https://", "")}
@@ -106,8 +112,12 @@ export default function Contact() {
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 animate-fade-in font-mono text-xs">
                   <CheckCircle2 size={18} className="shrink-0 mt-0.5" />
                   <div>
-                    <span className="block text-sm font-bold">Message sent successfully!</span>
-                    <span className="text-xs mt-0.5 block opacity-90">Thank you for reaching out. I'll get back to you as soon as possible.</span>
+                    <span className="block text-sm font-bold">
+                      {language === "tr" ? "Mesajınız başarıyla iletildi!" : "Message sent successfully!"}
+                    </span>
+                    <span className="text-xs mt-0.5 block opacity-90">
+                      {language === "tr" ? "İletişime geçtiğiniz için teşekkürler. En kısa sürede dönüş yapacağım." : "Thank you for reaching out. I'll get back to you as soon as possible."}
+                    </span>
                   </div>
                 </div>
               )}
@@ -116,8 +126,12 @@ export default function Contact() {
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-800 dark:text-red-300 animate-fade-in font-mono text-xs">
                   <AlertCircle size={18} className="shrink-0 mt-0.5" />
                   <div>
-                    <span className="block text-sm font-bold">Incomplete fields!</span>
-                    <span className="text-xs mt-0.5 block opacity-90">Please fill out your name, email, and message before submitting.</span>
+                    <span className="block text-sm font-bold">
+                      {language === "tr" ? "Eksik alanlar var!" : "Incomplete fields!"}
+                    </span>
+                    <span className="text-xs mt-0.5 block opacity-90">
+                      {language === "tr" ? "Lütfen göndermeden önce adınızı, e-postanızı ve mesajınızı doldurun." : "Please fill out your name, email, and message before submitting."}
+                    </span>
                   </div>
                 </div>
               )}
@@ -125,7 +139,7 @@ export default function Contact() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono">
                 <div>
                   <label htmlFor="name" className="block text-[10px] font-bold text-text-secondary mb-1.5 uppercase tracking-wider">
-                    Full Name
+                    {language === "tr" ? "Ad Soyad" : "Full Name"}
                   </label>
                   <input
                     type="text"
@@ -135,12 +149,12 @@ export default function Contact() {
                     onChange={handleChange}
                     disabled={status === "sending"}
                     className="w-full px-4 py-2.5 rounded-lg border border-border-color bg-bg-secondary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/40 focus:border-accent-primary disabled:opacity-50 transition-all duration-200"
-                    placeholder="Enter your name"
+                    placeholder={language === "tr" ? "Adınızı girin" : "Enter your name"}
                   />
                 </div>
                 <div>
                   <label htmlFor="email" className="block text-[10px] font-bold text-text-secondary mb-1.5 uppercase tracking-wider">
-                    Email Address
+                    {language === "tr" ? "E-Posta" : "Email Address"}
                   </label>
                   <input
                     type="email"
@@ -150,14 +164,14 @@ export default function Contact() {
                     onChange={handleChange}
                     disabled={status === "sending"}
                     className="w-full px-4 py-2.5 rounded-lg border border-border-color bg-bg-secondary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/40 focus:border-accent-primary disabled:opacity-50 transition-all duration-200"
-                    placeholder="Enter your email"
+                    placeholder={language === "tr" ? "E-posta adresiniz" : "Enter your email"}
                   />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="message" className="block text-[10px] font-bold text-text-secondary mb-1.5 uppercase tracking-wider font-mono">
-                  Your Message
+                  {language === "tr" ? "Mesajınız" : "Your Message"}
                 </label>
                 <textarea
                   id="message"
@@ -167,7 +181,7 @@ export default function Contact() {
                   onChange={handleChange}
                   disabled={status === "sending"}
                   className="w-full px-4 py-2.5 rounded-lg border border-border-color bg-bg-secondary text-text-primary text-sm font-mono focus:outline-none focus:ring-2 focus:ring-accent-primary/40 focus:border-accent-primary disabled:opacity-50 resize-none transition-all duration-200"
-                  placeholder="Enter details of your project or role request..."
+                  placeholder={language === "tr" ? "Mesajınızı veya proje detaylarını buraya yazabilirsiniz..." : "Enter details of your project or role request..."}
                 />
               </div>
 
@@ -179,12 +193,12 @@ export default function Contact() {
                 {status === "sending" ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Sending Message...
+                    {tButtons.sending}
                   </>
                 ) : (
                   <>
                     <Send size={15} />
-                    Send Message
+                    {tButtons.sendMessage}
                   </>
                 )}
               </Button>
@@ -198,3 +212,4 @@ export default function Contact() {
     </section>
   );
 }
+

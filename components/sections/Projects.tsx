@@ -4,11 +4,13 @@ import React from "react";
 import Card from "../ui/Card";
 import Badge from "../ui/Badge";
 import { useProfile } from "../ProfileContext";
+import { useLanguage } from "../LanguageContext";
 import { Github, ExternalLink, ArrowRight, TrendingUp } from "lucide-react";
 
 export default function Projects() {
   const { profile } = useProfile();
   const { projects } = profile;
+  const { language } = useLanguage();
 
   return (
     <section id="projects" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
@@ -48,7 +50,9 @@ export default function Projects() {
               <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-accent-muted border border-accent-primary/20 text-text-secondary mb-6">
                 <TrendingUp size={16} className="mt-0.5 shrink-0 text-accent-primary" />
                 <span className="text-xs font-medium leading-tight">
-                  <span className="font-bold text-accent-primary mr-1">Impact:</span> {project.keyImpact}
+                  <span className="font-bold text-accent-primary mr-1">
+                    {language === "tr" ? "Etki / Derece:" : "Impact:"}
+                  </span> {project.keyImpact}
                 </span>
               </div>
             </div>
@@ -63,7 +67,7 @@ export default function Projects() {
                   className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-accent-primary transition-colors duration-200"
                 >
                   <Github size={14} />
-                  Code
+                  {language === "tr" ? "Kod" : "Code"}
                 </a>
               )}
               {project.liveLink && (
@@ -82,7 +86,7 @@ export default function Projects() {
                   href={project.caseStudyLink}
                   className="flex items-center gap-1 text-xs font-semibold text-accent-primary hover:text-accent-secondary transition-colors duration-200 ml-auto"
                 >
-                  Case Study
+                  {language === "tr" ? "Detaylar" : "Case Study"}
                   <ArrowRight size={12} />
                 </a>
               )}
@@ -96,3 +100,4 @@ export default function Projects() {
     </section>
   );
 }
+

@@ -40,7 +40,9 @@ export default function BlogSection() {
         }
       }
     }
-  }, []);
+  if (!blogs || blogs.length === 0) {
+    return null;
+  }
 
   return (
     <section id="blog" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
