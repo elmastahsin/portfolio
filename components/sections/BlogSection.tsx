@@ -40,6 +40,8 @@ export default function BlogSection() {
         }
       }
     }
+  }, []);
+
   if (!blogs || blogs.length === 0) {
     return null;
   }
