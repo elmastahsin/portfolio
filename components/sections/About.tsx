@@ -71,7 +71,7 @@ export default function About() {
               {`{
   "developer": {
     "name": "${profile.name}",
-    "role": "Java & Training Delivery",
+    "role": "${profile.title}",
     "stack": ["Java", "Spring Boot", "Kafka"],
     "methods": ["Microservices", "Docker", "AWS"],
     "focus": "Enterprise Backend Systems",

@@ -89,7 +89,7 @@ export const translations = {
       projectsTitle: "Featured Projects",
       projectsSubtitle: "Selected projects demonstrating backend microservices, mobile, and machine learning capabilities.",
       experienceTitle: "Work Experience",
-      experienceSubtitle: "My professional career trajectory in backend software development and technical training delivery.",
+      experienceSubtitle: "My professional career trajectory in backend software development and computer engineering.",
       educationTitle: "Education",
       educationSubtitle: "Academic engineering foundation and computer science degree.",
       certificationsTitle: "Certifications & Awards",
@@ -97,7 +97,7 @@ export const translations = {
       contactTitle: "Get In Touch",
       contactSubtitle: "Feel free to reach out for collaborations, inquiries, or technical discussion.",
       blogTitle: "Latest Articles",
-      blogSubtitle: "Insights on software engineering, backend architecture, and training delivery.",
+      blogSubtitle: "Insights on software engineering, backend architecture, and distributed systems.",
     },
     buttons: {
       getInTouch: "Get In Touch",
@@ -135,7 +135,7 @@ export const translations = {
       projectsTitle: "Öne Çıkan Projeler",
       projectsSubtitle: "Backend mikroservisler, mobil ve makine öğrenmesi yetkinliklerimi yansıtan projeler.",
       experienceTitle: "İş Deneyimi",
-      experienceSubtitle: "Yazılım geliştirme ve teknik eğitim delivery süreçlerindeki profesyonel kariyer yolculuğum.",
+      experienceSubtitle: "Yazılım geliştirme ve bilgisayar mühendisliği süreçlerindeki profesyonel kariyer yolculuğum.",
       educationTitle: "Eğitim",
       educationSubtitle: "Akademik bilgisayar mühendisliği altyapım ve lisans derecem.",
       certificationsTitle: "Sertifikalar ve Ödüller",
@@ -143,7 +143,7 @@ export const translations = {
       contactTitle: "İletişime Geçin",
       contactSubtitle: "İş birliği, projeler veya teknik konular için benimle iletişime geçebilirsiniz.",
       blogTitle: "Son Yazılar",
-      blogSubtitle: "Yazılım mühendisliği, backend mimarileri ve eğitim delivery üzerine düşünceler.",
+      blogSubtitle: "Yazılım mühendisliği, backend mimarileri ve sistem geliştirme üzerine düşünceler.",
     },
     buttons: {
       getInTouch: "İletişime Geç",
@@ -166,8 +166,8 @@ export const translations = {
 
 export const profileDataEn: ProfileData = {
   name: "Tahsin Elmas",
-  title: "Software Developer & Training Delivery Specialist",
-  tagline: "Java Backend Developer & Training Delivery Specialist with 3+ years experience in Spring, Microservices, Docker, AWS, and ML Pipelines.",
+  title: "Computer Engineer & Backend Developer",
+  tagline: "Computer Engineer & Backend Developer with 3+ years experience in Spring, Microservices, Docker, AWS, and ML Pipelines.",
   location: "Ankara, Turkey",
   email: "tahsinelmasdev@gmail.com",
   cvUrl: "/TahsinELMAS.pdf",
@@ -179,11 +179,11 @@ export const profileDataEn: ProfileData = {
     email: "mailto:tahsinelmasdev@gmail.com"
   },
   about: {
-    bio: "IT Professional with 3+ years of experience specializing in Java Backend Development and Training Delivery. Proficient in SDLC and Agile methodologies, with strong expertise in Core Java, Spring Framework, Microservices, Kafka, Docker, and AWS. Proven success in developing scalable backend applications and delivering high-quality technical training programs.",
-    currentRole: "Software Developer & Training Delivery Specialist at IT KRAFT",
+    bio: "Computer Engineer with 3+ years of experience specializing in Java Backend Development and Software Architecture. Proficient in SDLC and Agile methodologies, with strong expertise in Core Java, Spring Framework, Microservices, Kafka, Docker, and AWS. Proven success in developing scalable backend applications and high-performance enterprise systems.",
+    currentRole: "Computer Engineer & Backend Developer at IT KRAFT",
     educationSummary: "B.Sc. in Computer Engineering from Middle East Technical University (METU / ODTÜ)",
-    careerFocus: "Architecting scalable enterprise backend applications, microservices, and leading high-quality technical training delivery programs.",
-    interests: ["Java Backend Architecture", "Spring Framework & Microservices", "Machine Learning & LLM Pipelines", "Cloud & DevOps (Docker, AWS, Kafka)", "Technical Content & Training Delivery"]
+    careerFocus: "Architecting scalable enterprise backend applications, microservices, and high-performance software systems.",
+    interests: ["Java Backend Architecture", "Spring Framework & Microservices", "Machine Learning & LLM Pipelines", "Cloud & DevOps (Docker, AWS, Kafka)", "Software Engineering & Clean Code"]
   },
   skills: [
     { title: "Programming Languages", items: ["Java", "Python", "C", "C++", "SQL", "TypeScript"] },
@@ -225,7 +225,7 @@ export const profileDataEn: ProfileData = {
   experience: [
     {
       company: "IT KRAFT",
-      role: "Software Developer & Training Delivery Specialist",
+      role: "Software Developer & Backend Engineer",
       location: "Ankara, Turkey",
       dateRange: "September 2024 - Present",
       responsibilities: [
@@ -284,8 +284,8 @@ export const profileDataEn: ProfileData = {
 
 export const profileDataTr: ProfileData = {
   name: "Tahsin Elmas",
-  title: "Yazılım Geliştirici & Eğitim Delivery Uzmanı",
-  tagline: "Spring, Mikroservisler, Docker, AWS ve ML Pipeline'larında 3+ yıl deneyimli Java Backend Geliştirici & Eğitim Delivery Uzmanı.",
+  title: "Computer Engineer & Backend Developer",
+  tagline: "Spring, Mikroservisler, Docker, AWS ve ML Pipeline'larında 3+ yıl deneyimli Bilgisayar Mühendisi & Backend Geliştirici.",
   location: "Ankara, Türkiye",
   email: "tahsinelmasdev@gmail.com",
   cvUrl: "/TahsinELMAS.pdf",
@@ -297,11 +297,11 @@ export const profileDataTr: ProfileData = {
     email: "mailto:tahsinelmasdev@gmail.com"
   },
   about: {
-    bio: "Java Backend Geliştirme ve Teknik Eğitim Delivery süreçlerinde 3 yılı aşkın deneyime sahip IT profesyoneli. SDLC ve Çevik (Agile) metodolojilerde uzman; Core Java, Spring Framework, Mikroservisler, Kafka, Docker ve AWS konularında güçlü teknik yetkinliğe sahip. Ölçeklenebilir backend uygulamaları geliştirme ve yüksek kaliteli teknik eğitim programları sunmada kanıtlanmış başarı.",
-    currentRole: "IT KRAFT şirketinde Yazılım Geliştirici & Eğitim Delivery Uzmanı",
+    bio: "Java Backend Geliştirme ve Yazılım Mimarisi süreçlerinde 3 yılı aşkın deneyime sahip Bilgisayar Mühendisi. SDLC ve Çevik (Agile) metodolojilerde uzman; Core Java, Spring Framework, Mikroservisler, Kafka, Docker ve AWS konularında güçlü teknik yetkinliğe sahip. Ölçeklenebilir backend uygulamaları ve yüksek performanslı kurumsal sistemler geliştirmede kanıtlanmış başarı.",
+    currentRole: "IT KRAFT şirketinde Bilgisayar Mühendisi & Backend Geliştirici",
     educationSummary: "Orta Doğu Teknik Üniversitesi (METU / ODTÜ) — Bilgisayar Mühendisliği (Lisans)",
-    careerFocus: "Ölçeklenebilir kurumsal backend uygulamaları, mikroservis mimarileri geliştirmek ve yüksek kaliteli teknik eğitim delivery süreçlerine liderlik etmek.",
-    interests: ["Java Backend Mimarisi", "Spring Framework & Mikroservisler", "Makine Öğrenmesi & LLM Hatları", "Bulut & DevOps (Docker, AWS, Kafka)", "Teknik İçerik & Eğitim Delivery"]
+    careerFocus: "Ölçeklenebilir kurumsal backend uygulamaları, mikroservis mimarileri ve yüksek performanslı yazılım sistemleri geliştirmek.",
+    interests: ["Java Backend Mimarisi", "Spring Framework & Mikroservisler", "Makine Öğrenmesi & LLM Hatları", "Bulut & DevOps (Docker, AWS, Kafka)", "Yazılım Mühendisliği & Temiz Kod"]
   },
   skills: [
     { title: "Programlama Dilleri", items: ["Java", "Python", "C", "C++", "SQL", "TypeScript"] },
@@ -343,7 +343,7 @@ export const profileDataTr: ProfileData = {
   experience: [
     {
       company: "IT KRAFT",
-      role: "Yazılım Geliştirici & Eğitim Delivery Uzmanı",
+      role: "Yazılım Geliştirici & Backend Mühendisi",
       location: "Ankara, Türkiye",
       dateRange: "Eylül 2024 - Günümüz",
       responsibilities: [
