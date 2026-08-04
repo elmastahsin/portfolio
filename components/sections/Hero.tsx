@@ -18,7 +18,7 @@ export default function Hero() {
   const { language } = useLanguage();
   const t = translations[language].buttons;
   const historyContainerRef = useRef<HTMLDivElement>(null);
-  
+
   // Terminal state
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<CommandLog[]>([]);
@@ -38,7 +38,7 @@ export default function Hero() {
         output: (
           <div className="flex gap-4 font-mono text-[10px] text-text-secondary leading-normal leading-relaxed animate-fade-in select-none">
             <pre className="text-accent-primary shrink-0 hidden sm:block">
-{`   /\\_/\\
+              {`   /\\_/\\
   ( o.o )
    > ^ <
  /|     |\\
@@ -48,7 +48,7 @@ export default function Hero() {
             <div className="space-y-0.5">
               <p className="font-bold text-accent-secondary">tahsin@developer-core</p>
               <p>-------------------------</p>
-              <p><span className="text-accent-primary">OS</span>: macOS Antigravity Edition</p>
+              <p><span className="text-accent-primary">OS</span>: macOS</p>
               <p><span className="text-accent-primary">Host</span>: Web-Terminal Simulator</p>
               <p><span className="text-accent-primary">Kernel</span>: Next.js App Router</p>
               <p><span className="text-accent-primary">Shell</span>: zsh v5.9</p>
@@ -104,12 +104,12 @@ export default function Hero() {
       case "skills":
         {
           const rawSkills = profile.skills;
-          const categoriesList = Array.isArray(rawSkills) 
-            ? rawSkills 
+          const categoriesList = Array.isArray(rawSkills)
+            ? rawSkills
             : [
-                { title: "Backend", items: (rawSkills as any)?.backend || [] },
-                { title: "Databases", items: (rawSkills as any)?.databases || [] }
-              ];
+              { title: "Backend", items: (rawSkills as any)?.backend || [] },
+              { title: "Databases", items: (rawSkills as any)?.databases || [] }
+            ];
           response = (
             <div className="font-mono text-[10px] text-text-secondary space-y-1">
               {categoriesList.slice(0, 4).map((c, i) => (
@@ -163,7 +163,7 @@ export default function Hero() {
       </div>
 
       <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center z-10 animate-fade-in">
-        
+
         {/* Left Column: Heading & CTAs */}
         <div className="lg:col-span-7 space-y-6 text-left">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-accent-muted/40 dark:bg-accent-muted/10 text-accent-primary border border-accent-primary/20">
@@ -285,7 +285,7 @@ export default function Hero() {
             </div>
 
             {/* Terminal History */}
-            <div 
+            <div
               ref={historyContainerRef}
               className="p-4 bg-bg-primary h-60 overflow-y-auto space-y-3"
             >
