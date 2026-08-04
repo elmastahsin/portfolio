@@ -1,0 +1,28 @@
+name: Deploy Portfolio
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: portfolio-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Linux, X64]
+
+    steps:
+      - name: Update project
+        working-directory: /home/tahsin/server/portfolio
+        run: git pull --ff-only origin main
+
+      - name: Rebuild container
+        working-directory: /home/tahsin/server
+        run: docker compose up -d --force-recreate portfolio
+
+      - name: Show container status
+        working-directory: /home/tahsin/server
+        run: docker compose ps portfolio
