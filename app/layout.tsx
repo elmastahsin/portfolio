@@ -4,7 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeContext";
 import { ProfileProvider } from "@/components/ProfileContext";
 import { LanguageProvider } from "@/components/LanguageContext";
-import { supabaseServer } from "@/lib/supabaseServer";
+import { getProfile } from "@/lib/database";
 import { ProfileData, profileData as defaultProfile } from "@/data/profile";
 
 const inter = Inter({
@@ -20,34 +20,8 @@ const jetbrains = JetBrains_Mono({
 });
 
 async function getProfileData(): Promise<ProfileData> {
-  if (!supabaseServer) return defaultProfile;
   try {
-    const { data, error } = await supabaseServer
-      .from("portfolio_profile")
-      .select("*")
-      .eq("id", 1)
-      .single();
-
-    if (error || !data) return defaultProfile;
-
-    return {
-      name: data.name,
-      title: data.title,
-      tagline: data.tagline,
-      location: data.location,
-      email: data.email,
-      cvUrl: data.cv_url || data.cvUrl || "#",
-      profileImage: data.profile_image || data.profileImage || "/images/profile.jpg",
-      themeColor: data.theme_color || data.themeColor || "emerald",
-      socials: data.socials || {},
-      about: data.about || {},
-      skills: data.skills || [],
-      projects: data.projects || defaultProfile.projects,
-      experience: data.experience || defaultProfile.experience,
-      education: data.education || defaultProfile.education,
-      certifications: data.certifications || defaultProfile.certifications,
-      languages: data.languages || defaultProfile.languages
-    };
+    return await getProfile();
   } catch (e) {
     console.error("Error fetching profile on server side:", e);
     return defaultProfile;
@@ -57,18 +31,18 @@ async function getProfileData(): Promise<ProfileData> {
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfileData();
   return {
-    metadataBase: new URL("https://example.com"),
+    metadataBase: new URL("https://tahsinelmas.com"),
     title: {
       default: `${profile.name} | ${profile.title}`,
       template: `%s | ${profile.name}`
     },
     description: profile.tagline,
     keywords: [
-      "Software Engineer",
-      "AI Engineer",
-      "Machine Learning Engineer",
+      "Java Backend Developer",
+      "Spring Boot Developer",
+      "Microservices Engineer",
+      "Software Developer",
       "Computer Engineering",
-      "Full-Stack Developer",
       "Portfolio",
       ...profile.skills.flatMap(s => s.items)
     ],
@@ -77,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: "en_US",
-      url: "https://example.com",
+      url: "https://tahsinelmas.com",
       title: `${profile.name} | ${profile.title}`,
       description: profile.tagline,
       siteName: `${profile.name} Portfolio`,
@@ -94,7 +68,6 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: `${profile.name} | ${profile.title}`,
       description: profile.tagline,
-      creator: "@example",
       images: ["/og-image.png"]
     },
     icons: {

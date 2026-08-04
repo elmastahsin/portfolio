@@ -47,10 +47,15 @@ export default function AdminLoginPage() {
 
   const verifyCredentials = (userVal: string, passVal: string) => {
     setTimeout(() => {
-      const expectedUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME || "admin";
-      const expectedPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin";
+      const expectedUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME;
+      const expectedPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
-      if (userVal === expectedUsername && passVal === expectedPassword) {
+      if (
+        expectedUsername &&
+        expectedPassword &&
+        userVal === expectedUsername &&
+        passVal === expectedPassword
+      ) {
         setTerminalHistory((prev) => [
           ...prev,
           "Access GRANTED.",
@@ -192,11 +197,6 @@ export default function AdminLoginPage() {
           <p className="font-mono text-[9px] text-text-tertiary select-none">
             // Tap the terminal screen to focus and type. Press Enter to submit.
           </p>
-          {!process.env.NEXT_PUBLIC_ADMIN_USERNAME && (
-            <p className="font-mono text-[9px] text-text-tertiary select-none">
-              // Hint: default credentials are Username: <span className="text-accent-primary">admin</span> | Pass: <span className="text-accent-primary">admin</span>
-            </p>
-          )}
         </div>
       </div>
     </div>

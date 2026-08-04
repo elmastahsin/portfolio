@@ -18,7 +18,11 @@ export default function AdminDashboardPage() {
   const { profile, updateProfile } = useProfile();
   
   // Dashboard Tabs
-  const [activeTab, setActiveTab] = useState<"blogs" | "profile">("blogs");
+  const [activeTab, setActiveTab] = useState<"blogs" | "profile" | "messages">("blogs");
+
+  // Contact messages
+  const [messages, setMessages] = useState<{ id: number; name: string; email: string; message: string; createdAt: string; read: boolean }[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
 
   // Blog states
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -73,6 +77,7 @@ export default function AdminDashboardPage() {
 
     // Load initial list
     loadBlogs();
+    loadMessages();
 
     // Map profile values to form states
     setProfileName(profile.name);
@@ -121,7 +126,7 @@ export default function AdminDashboardPage() {
       setBlogs(data);
       setCustomBlogs(data.filter(b => !b.id.startsWith("post-")));
     } catch (e) {
-      console.error("Could not load blogs from Supabase, loading fallback static mock articles.", e);
+      console.error("Could not load blogs from database, loading fallback static mock articles.", e);
       const local = localStorage.getItem("custom_blogs");
       let parsedCustom: BlogPost[] = [];
       if (local) {
@@ -133,6 +138,52 @@ export default function AdminDashboardPage() {
         }
       }
       setBlogs([...parsedCustom, ...initialBlogs]);
+    }
+  };
+
+  const loadMessages = async () => {
+    setMessagesLoading(true);
+    try {
+      const token = localStorage.getItem("admin_token") || "";
+      const res = await fetch("/api/contact", {
+        headers: { "Authorization": token }
+      });
+      if (!res.ok) throw new Error("Failed to fetch messages");
+      setMessages(await res.json());
+    } catch (e) {
+      console.error("Could not load contact messages.", e);
+    } finally {
+      setMessagesLoading(false);
+    }
+  };
+
+  const handleMarkMessageRead = async (id: number) => {
+    try {
+      const token = localStorage.getItem("admin_token") || "";
+      await fetch(`/api/contact?id=${id}`, {
+        method: "PATCH",
+        headers: { "Authorization": token }
+      });
+      setMessages(prev => prev.map(m => m.id === id ? { ...m, read: true } : m));
+    } catch (e) {
+      console.error("Could not mark message as read.", e);
+    }
+  };
+
+  const handleDeleteMessage = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+    try {
+      const token = localStorage.getItem("admin_token") || "";
+      const res = await fetch(`/api/contact?id=${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": token }
+      });
+      if (!res.ok) throw new Error("Failed to delete message");
+      setMessages(prev => prev.filter(m => m.id !== id));
+      triggerNotification("Success: Message deleted");
+    } catch (e) {
+      console.error("Could not delete message.", e);
+      triggerNotification("ERROR: Could not delete message", "error");
     }
   };
 
@@ -399,6 +450,19 @@ export default function AdminDashboardPage() {
               }`}
             >
               Profile Settings
+            </button>
+            <button
+              onClick={() => setActiveTab("messages")}
+              className={`relative px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition-all cursor-pointer ${
+                activeTab === "messages"
+                  ? "bg-bg-secondary text-accent-primary shadow-sm"
+                  : "text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              Messages
+              {messages.some(m => !m.read) && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent-primary" />
+              )}
             </button>
           </div>
 
@@ -975,6 +1039,66 @@ export default function AdminDashboardPage() {
                 </Button>
               </form>
             </Card>
+          </div>
+        )}
+
+        {/* Tab 3: Contact Messages */}
+        {activeTab === "messages" && (
+          <div className="space-y-4 max-w-4xl">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-mono text-sm font-bold text-text-primary">
+                Inbox <span className="text-text-tertiary">({messages.length})</span>
+              </h2>
+              <Button variant="outline" size="sm" onClick={loadMessages} className="font-mono text-xs cursor-pointer">
+                Refresh
+              </Button>
+            </div>
+
+            {messagesLoading && (
+              <p className="font-mono text-xs text-text-tertiary">Loading messages...</p>
+            )}
+
+            {!messagesLoading && messages.length === 0 && (
+              <p className="text-center font-mono text-[10px] text-text-tertiary py-8 bg-bg-secondary/20 rounded-xl border border-dashed border-border-color">
+                No messages yet.
+              </p>
+            )}
+
+            {messages.map((m) => (
+              <Card
+                key={m.id}
+                hoverEffect={false}
+                glassmorphism={true}
+                className={`border p-5 ${m.read ? "border-border-color" : "border-accent-primary/40"}`}
+              >
+                <div className="flex items-start justify-between gap-4 mb-2">
+                  <div>
+                    <span className="block text-sm font-bold text-text-primary">{m.name}</span>
+                    <a href={`mailto:${m.email}`} className="text-xs text-accent-primary font-mono hover:underline">{m.email}</a>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] font-mono text-text-tertiary">
+                      {new Date(m.createdAt).toLocaleString()}
+                    </span>
+                    {!m.read && (
+                      <button
+                        onClick={() => handleMarkMessageRead(m.id)}
+                        className="text-[10px] font-mono px-2 py-1 rounded border border-accent-primary/40 text-accent-primary hover:bg-accent-primary/10 cursor-pointer"
+                      >
+                        Mark read
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDeleteMessage(m.id)}
+                      className="p-1.5 rounded text-text-tertiary hover:text-red-500 hover:bg-red-500/10 cursor-pointer"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+                <p className="text-sm text-text-secondary whitespace-pre-wrap">{m.message}</p>
+              </Card>
+            ))}
           </div>
         )}
 

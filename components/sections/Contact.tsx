@@ -14,21 +14,32 @@ export default function Contact() {
   const tButtons = translations[language].buttons;
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorReason, setErrorReason] = useState<"validation" | "network">("validation");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.name || !formState.email || !formState.message) {
+      setErrorReason("validation");
       setStatus("error");
       return;
     }
-    
+
     setStatus("sending");
-    
-    // Simulate API request
-    setTimeout(() => {
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formState),
+      });
+      if (!res.ok) throw new Error("Failed to send message");
       setStatus("success");
       setFormState({ name: "", email: "", message: "" });
-    }, 1500);
+    } catch (err) {
+      console.error("Could not send message", err);
+      setErrorReason("network");
+      setStatus("error");
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -94,7 +105,7 @@ export default function Contact() {
                   <span className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-0.5">
                     {language === "tr" ? "LinkedIn Profili" : "Connect on LinkedIn"}
                   </span>
-                  <span className="text-sm font-semibold text-text-primary truncate max-w-[180px] block">
+                  <span className="text-sm font-semibold text-text-primary break-all block">
                     {profile.socials.linkedin.replace("https://", "")}
                   </span>
                 </div>
@@ -127,10 +138,14 @@ export default function Contact() {
                   <AlertCircle size={18} className="shrink-0 mt-0.5" />
                   <div>
                     <span className="block text-sm font-bold">
-                      {language === "tr" ? "Eksik alanlar var!" : "Incomplete fields!"}
+                      {errorReason === "validation"
+                        ? (language === "tr" ? "Eksik alanlar var!" : "Incomplete fields!")
+                        : (language === "tr" ? "Mesaj gönderilemedi!" : "Message failed to send!")}
                     </span>
                     <span className="text-xs mt-0.5 block opacity-90">
-                      {language === "tr" ? "Lütfen göndermeden önce adınızı, e-postanızı ve mesajınızı doldurun." : "Please fill out your name, email, and message before submitting."}
+                      {errorReason === "validation"
+                        ? (language === "tr" ? "Lütfen göndermeden önce adınızı, e-postanızı ve mesajınızı doldurun." : "Please fill out your name, email, and message before submitting.")
+                        : (language === "tr" ? "Bir şeyler ters gitti, lütfen tekrar deneyin veya doğrudan e-posta gönderin." : "Something went wrong, please try again or email me directly.")}
                     </span>
                   </div>
                 </div>

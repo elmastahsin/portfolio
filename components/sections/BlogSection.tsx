@@ -25,7 +25,7 @@ export default function BlogSection() {
         }
       })
       .catch((err) => {
-        console.warn("Could not fetch blogs from Supabase, checking local fallback.", err);
+        console.warn("Could not fetch blogs from database, checking local fallback.", err);
         loadFallback();
       });
 

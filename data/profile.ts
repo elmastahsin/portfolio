@@ -204,8 +204,7 @@ export const profileDataEn: ProfileData = {
       description: "A real-time multiplayer card game system implementing core game logic, leaderboards, and JWT-based authentication to manage session integrity and multiplayer state flow.",
       techStack: ["Java", "Spring Boot", "JavaFX", "JWT", "REST APIs"],
       keyImpact: "Engineered real-time multiplayer state orchestration and secure JWT authentication.",
-      githubLink: "https://github.com/elmastahsin",
-      liveLink: "https://github.com/elmastahsin/CENG453_20242_Group3_frontend"
+      githubLink: "https://github.com/elmastahsin/CENG453_20242_Group3_frontend"
     },
     {
       title: "Varlık (Wealth & Asset Tracking Platform)",
@@ -220,8 +219,7 @@ export const profileDataEn: ProfileData = {
       description: "A machine learning pipeline developed for electrical utility infrastructure to predict Mean Time to Repair (MTTR), improving predictive maintenance and grid reliability.",
       techStack: ["Python", "Machine Learning", "Scikit-Learn", "SQL", "Pandas"],
       keyImpact: "Optimized maintenance scheduling and outage restoration analysis for electrical utilities.",
-      githubLink: "https://github.com/elmastahsin",
-      liveLink: "#"
+      githubLink: "https://github.com/elmastahsin"
     }
   ],
   experience: [
@@ -324,8 +322,7 @@ export const profileDataTr: ProfileData = {
       description: "Çekirdek oyun mantığını, liderlik tablosunu ve oturum güvenliğini sağlayan JWT tabanlı kimlik doğrulama mimarisini içeren gerçek zamanlı çok oyunculu kart oyunu sistemi.",
       techStack: ["Java", "Spring Boot", "JavaFX", "JWT", "REST APIs"],
       keyImpact: "Gerçek zamanlı çok oyunculu durum yönetimi ve güvenli JWT doğrulama altyapısı kuruldu.",
-      githubLink: "https://github.com/elmastahsin",
-      liveLink: "https://github.com/elmastahsin/CENG453_20242_Group3_frontend"
+      githubLink: "https://github.com/elmastahsin/CENG453_20242_Group3_frontend"
     },
     {
       title: "Varlık (Finans ve Varlık Takip Platformu)",
@@ -340,8 +337,7 @@ export const profileDataTr: ProfileData = {
       description: "Elektrik altyapı şebekelerinde Ortalama Onarım Süresini (MTTR) tahmin etmek için geliştirilmiş makine öğrenmesi hattı.",
       techStack: ["Python", "Machine Learning", "Scikit-Learn", "SQL", "Pandas"],
       keyImpact: "Elektrik şebekeleri için kestirimci bakım ve arıza giderme analizlerini optimize etti.",
-      githubLink: "https://github.com/elmastahsin",
-      liveLink: "varlik.tahsinelmas.com"
+      githubLink: "https://github.com/elmastahsin"
     }
   ],
   experience: [

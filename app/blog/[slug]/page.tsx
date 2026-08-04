@@ -16,7 +16,7 @@ export default function BlogDetailPage() {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    // 1. Try to fetch all blogs from the Supabase API first
+    // 1. Try to fetch all blogs from the database API first
     fetch("/api/blogs")
       .then((res) => {
         if (!res.ok) throw new Error("API error status " + res.status);
@@ -31,7 +31,7 @@ export default function BlogDetailPage() {
         }
       })
       .catch((err) => {
-        console.warn("Could not load blogs from Supabase, checking local/static fallback.", err);
+        console.warn("Could not load blogs from database, checking local/static fallback.", err);
         loadFallback();
       });
 
