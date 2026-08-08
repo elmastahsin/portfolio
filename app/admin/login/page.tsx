@@ -21,9 +21,24 @@ export default function AdminLoginPage() {
   ]);
 
   useEffect(() => {
-    // If already logged in, skip login screen
-    if (localStorage.getItem("admin_session") === "true") {
-      router.push("/admin");
+    // If token exists, verify with server before skipping login
+    const token = localStorage.getItem("admin_token");
+    if (token) {
+      fetch("/api/auth", {
+        headers: { Authorization: token },
+      })
+        .then((res) => {
+          if (res.ok) {
+            localStorage.setItem("admin_session", "true");
+            router.push("/admin");
+          } else {
+            localStorage.removeItem("admin_session");
+            localStorage.removeItem("admin_token");
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem("admin_session");
+        });
     }
   }, [router]);
 
@@ -45,25 +60,25 @@ export default function AdminLoginPage() {
     }
   };
 
-  const verifyCredentials = (userVal: string, passVal: string) => {
-    setTimeout(() => {
-      const expectedUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME;
-      const expectedPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+  const verifyCredentials = async (userVal: string, passVal: string) => {
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: userVal, password: passVal }),
+      });
 
-      if (
-        expectedUsername &&
-        expectedPassword &&
-        userVal === expectedUsername &&
-        passVal === expectedPassword
-      ) {
+      const data = await res.json();
+
+      if (res.ok && data.success && data.token) {
         setTerminalHistory((prev) => [
           ...prev,
           "Access GRANTED.",
           "Establishing secure shell session...",
-          "System loading completed."
+          "System loading completed.",
         ]);
         localStorage.setItem("admin_session", "true");
-        localStorage.setItem("admin_token", passVal);
+        localStorage.setItem("admin_token", data.token);
         setLoginStep("success");
         setTimeout(() => {
           router.push("/admin");
@@ -71,15 +86,25 @@ export default function AdminLoginPage() {
       } else {
         setTerminalHistory((prev) => [
           ...prev,
-          "ACCESS DENIED: Invalid credential tokens.",
+          `ACCESS DENIED: ${data.error || "Invalid credential tokens."}`,
           "Connection closed.",
-          ""
+          "",
         ]);
         setLoginStep("username");
         setUsername("");
         setInputValue("");
       }
-    }, 1200);
+    } catch (e) {
+      setTerminalHistory((prev) => [
+        ...prev,
+        "ACCESS ERROR: System login service unavailable.",
+        "Connection closed.",
+        "",
+      ]);
+      setLoginStep("username");
+      setUsername("");
+      setInputValue("");
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

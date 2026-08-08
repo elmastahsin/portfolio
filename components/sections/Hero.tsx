@@ -145,7 +145,7 @@ export default function Hero() {
         setInput("");
         return;
       default:
-        response = <span className="text-red-400 font-mono text-[10px]">// COMMAND_NOT_FOUND: "{cleanCmd}". Type 'help' for options.</span>;
+        response = <span className="text-red-400 font-mono text-[10px]">{`// COMMAND_NOT_FOUND: "${cleanCmd}". Type 'help' for options.`}</span>;
     }
 
     setHistory((prev) => [...prev, { cmd: input, output: response }]);
@@ -177,7 +177,7 @@ export default function Hero() {
           </h1>
 
           <h2 className="font-display font-medium text-lg md:text-2xl text-text-secondary tracking-wide font-mono">
-            const developer = "{profile.title}";
+            {`const developer = "${profile.title}";`}
           </h2>
 
           <p className="text-sm md:text-base text-text-tertiary max-w-xl leading-relaxed font-normal">

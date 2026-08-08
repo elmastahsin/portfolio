@@ -36,19 +36,19 @@ export default function Skills() {
   const categoriesList: { title: string; items: string[] }[] = Array.isArray(rawSkills) 
     ? rawSkills 
     : [
-        { title: "Backend Development", items: (rawSkills as any)?.backend || [] },
-        { title: "Frontend & Mobile", items: (rawSkills as any)?.frontendMobile || [] },
-        { title: "AI / Machine Learning", items: (rawSkills as any)?.aiMl || [] },
-        { title: "Databases & Cache", items: (rawSkills as any)?.databases || [] },
-        { title: "DevOps & Tools", items: (rawSkills as any)?.devOpsTools || [] },
-        { title: "Architecture & Standards", items: (rawSkills as any)?.architectureCertifications || [] }
+        { title: "Backend Development", items: (rawSkills as Record<string, string[]> | undefined)?.backend || [] },
+        { title: "Frontend & Mobile", items: (rawSkills as Record<string, string[]> | undefined)?.frontendMobile || [] },
+        { title: "AI / Machine Learning", items: (rawSkills as Record<string, string[]> | undefined)?.aiMl || [] },
+        { title: "Databases & Cache", items: (rawSkills as Record<string, string[]> | undefined)?.databases || [] },
+        { title: "DevOps & Tools", items: (rawSkills as Record<string, string[]> | undefined)?.devOpsTools || [] },
+        { title: "Architecture & Standards", items: (rawSkills as Record<string, string[]> | undefined)?.architectureCertifications || [] }
       ].filter((c): c is { title: string; items: string[] } => !!c.items && c.items.length > 0);
 
   return (
     <section id="skills" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
       {/* Section Title */}
       <div className="mb-12 font-mono">
-        <div className="text-xs text-text-tertiary dark:text-accent-primary/80 font-bold mb-1">// 02. loading_capabilities()</div>
+        <div className="text-xs text-text-tertiary dark:text-accent-primary/80 font-bold mb-1">{"// 02. loading_capabilities()"}</div>
         <h2 className="font-display font-bold text-2xl md:text-3xl text-text-primary flex items-center gap-1">
           <span className="text-accent-secondary">const</span> getSkills <span className="text-text-secondary">=</span> <span className="text-text-tertiary">()</span> <span className="text-accent-secondary">=&gt;</span> <span className="text-text-tertiary">{`{`}</span>
         </h2>

@@ -19,7 +19,7 @@ interface ProfileProviderProps {
 export function ProfileProvider({ children, initialProfile }: ProfileProviderProps) {
   const { language } = useLanguage();
   const [profile, setProfile] = useState<ProfileData>(
-    language === "tr" ? profileDataTr : profileDataEn
+    initialProfile || (language === "tr" ? profileDataTr : profileDataEn)
   );
 
   useEffect(() => {
@@ -32,9 +32,12 @@ export function ProfileProvider({ children, initialProfile }: ProfileProviderPro
         console.error("Failed to parse custom profile data", err);
       }
     }
-    // Set profile based on active language
-    setProfile(language === "tr" ? profileDataTr : profileDataEn);
-  }, [language]);
+    if (initialProfile) {
+      setProfile(initialProfile);
+    } else {
+      setProfile(language === "tr" ? profileDataTr : profileDataEn);
+    }
+  }, [language, initialProfile]);
 
   useEffect(() => {
     if (!profile) return;

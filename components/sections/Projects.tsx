@@ -16,7 +16,7 @@ export default function Projects() {
     <section id="projects" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
       {/* Section Title */}
       <div className="mb-12 font-mono">
-        <div className="text-xs text-text-tertiary dark:text-accent-primary/80 font-bold mb-1">// 03. active_repositories()</div>
+        <div className="text-xs text-text-tertiary dark:text-accent-primary/80 font-bold mb-1">{"// 03. active_repositories()"}</div>
         <h2 className="font-display font-bold text-2xl md:text-3xl text-text-primary flex items-center gap-1">
           <span className="text-accent-secondary">class</span> Projects <span className="text-accent-secondary">extends</span> Repository <span className="text-text-tertiary">{`{`}</span>
         </h2>

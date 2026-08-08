@@ -5,7 +5,7 @@ import Card from "../ui/Card";
 import { useProfile } from "../ProfileContext";
 import { useLanguage } from "../LanguageContext";
 import { translations } from "@/data/profile";
-import { Briefcase, GraduationCap, MapPin, Compass, CheckCircle } from "lucide-react";
+import { Briefcase, GraduationCap, MapPin, Compass, CheckCircle, Globe } from "lucide-react";
 
 export default function About() {
   const { profile } = useProfile();
@@ -98,6 +98,26 @@ export default function About() {
               ))}
             </div>
           </Card>
+
+          {/* Languages Card */}
+          {profile.languages && profile.languages.length > 0 && (
+            <Card hoverEffect={false} glassmorphism={true} className="p-6">
+              <h3 className="font-display font-semibold text-lg text-text-primary mb-4 flex items-center gap-2">
+                <Globe size={18} className="text-accent-primary" />
+                {language === "tr" ? "Diller" : "Languages"}
+              </h3>
+              <div className="flex flex-wrap gap-2.5">
+                {profile.languages.map((lang, index) => (
+                  <span
+                    key={index}
+                    className="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-bg-tertiary text-text-secondary border border-border-color hover:border-accent-primary/40 dark:hover:border-accent-primary/20 hover:text-text-primary transition-all duration-200"
+                  >
+                    {lang}
+                  </span>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
       </div>
       

@@ -1,15 +1,10 @@
 import { NextResponse } from "next/server";
 import { deleteMessage, getMessages, markMessageRead, saveMessage } from "@/lib/database";
+import { isAuthorizedRequest } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function isAuthorized(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  const expectedPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-  return Boolean(expectedPassword) && authHeader === expectedPassword;
-}
 
 // 1. POST: Public — submit a contact message
 export async function POST(request: Request) {
@@ -38,7 +33,7 @@ export async function POST(request: Request) {
 
 // 2. GET: Admin-only — list messages
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isAuthorizedRequest(request)) {
     return NextResponse.json({ error: "UNAUTHORIZED: Invalid credentials token" }, { status: 401 });
   }
   try {
@@ -50,7 +45,7 @@ export async function GET(request: Request) {
 
 // 3. PATCH: Admin-only — mark a message as read
 export async function PATCH(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isAuthorizedRequest(request)) {
     return NextResponse.json({ error: "UNAUTHORIZED: Invalid credentials token" }, { status: 401 });
   }
   try {
@@ -68,7 +63,7 @@ export async function PATCH(request: Request) {
 
 // 4. DELETE: Admin-only — delete a message
 export async function DELETE(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isAuthorizedRequest(request)) {
     return NextResponse.json({ error: "UNAUTHORIZED: Invalid credentials token" }, { status: 401 });
   }
   try {

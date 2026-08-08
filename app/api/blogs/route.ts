@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteBlog, getBlogs, saveBlog } from "@/lib/database";
+import { isAuthorizedRequest } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +17,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     // Authentication Check
-    const authHeader = request.headers.get("authorization");
-    const expectedPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
-    if (!expectedPassword || authHeader !== expectedPassword) {
+    if (!isAuthorizedRequest(request)) {
       return NextResponse.json({ error: "UNAUTHORIZED: Invalid credentials token" }, { status: 401 });
     }
 
@@ -40,10 +38,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     // Authentication Check
-    const authHeader = request.headers.get("authorization");
-    const expectedPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
-    if (!expectedPassword || authHeader !== expectedPassword) {
+    if (!isAuthorizedRequest(request)) {
       return NextResponse.json({ error: "UNAUTHORIZED: Invalid credentials token" }, { status: 401 });
     }
 

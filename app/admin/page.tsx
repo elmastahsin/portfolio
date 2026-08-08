@@ -10,8 +10,9 @@ import { useProfile } from "@/components/ProfileContext";
 import { 
   FileText, Plus, Trash2, Edit2, LogOut, Save, ArrowLeft, 
   Settings, CheckCircle2, ChevronRight, BookOpen, AlertCircle,
-  User, Link as LinkIcon
+  User, Link as LinkIcon, Briefcase, GraduationCap, Award, FolderGit2, Languages, Image as ImageIcon
 } from "lucide-react";
+import { ProfileData } from "@/data/profile";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -47,7 +48,9 @@ export default function AdminDashboardPage() {
   const [profileLocation, setProfileLocation] = useState("");
   const [profileEmail, setProfileEmail] = useState("");
   const [profileCvUrl, setProfileCvUrl] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const [profileThemeColor, setProfileThemeColor] = useState<"emerald" | "cyan" | "amber" | "fuchsia" | "red">("emerald");
+  const [profileLanguages, setProfileLanguages] = useState("");
   
   const [profileBio, setProfileBio] = useState("");
   const [profileCurrentRole, setProfileCurrentRole] = useState("");
@@ -63,42 +66,99 @@ export default function AdminDashboardPage() {
   
   // Skills Form fields
   const [skillsList, setSkillsList] = useState<{ title: string; items: string }[]>([]);
+
+  // Projects Form fields
+  const [projectsList, setProjectsList] = useState<{
+    title: string;
+    description: string;
+    techStack: string;
+    keyImpact: string;
+    githubLink: string;
+    liveLink: string;
+    caseStudyLink: string;
+  }[]>([]);
+
+  // Experience Form fields
+  const [experienceList, setExperienceList] = useState<{
+    company: string;
+    role: string;
+    location: string;
+    dateRange: string;
+    responsibilities: string;
+    keyAchievements: string;
+  }[]>([]);
+
+  // Education Form fields
+  const [educationList, setEducationList] = useState<{
+    university: string;
+    degree: string;
+    department: string;
+    dateRange: string;
+    location: string;
+    coursework: string;
+    focus: string;
+  }[]>([]);
+
+  // Certifications Form fields
+  const [certificationsList, setCertificationsList] = useState<{
+    title: string;
+    issuer: string;
+    date: string;
+    url: string;
+    description: string;
+  }[]>([]);
   
   // Global Notification
   const [notif, setNotif] = useState({ show: false, message: "", type: "success" });
 
   useEffect(() => {
     setIsClient(true);
-    // Authentication Check
-    if (localStorage.getItem("admin_session") !== "true") {
+    // Authentication Check with Server
+    const token = localStorage.getItem("admin_token");
+    if (!token) {
       router.push("/admin/login");
       return;
     }
+    fetch("/api/auth", {
+      headers: { Authorization: token },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          localStorage.removeItem("admin_session");
+          localStorage.removeItem("admin_token");
+          router.push("/admin/login");
+        }
+      })
+      .catch(() => {
+        router.push("/admin/login");
+      });
 
     // Load initial list
     loadBlogs();
     loadMessages();
 
     // Map profile values to form states
-    setProfileName(profile.name);
-    setProfileTitle(profile.title);
-    setProfileTagline(profile.tagline);
-    setProfileLocation(profile.location);
-    setProfileEmail(profile.email);
+    setProfileName(profile.name || "");
+    setProfileTitle(profile.title || "");
+    setProfileTagline(profile.tagline || "");
+    setProfileLocation(profile.location || "");
+    setProfileEmail(profile.email || "");
     setProfileCvUrl(profile.cvUrl || "");
+    setProfileImage(profile.profileImage || "/images/profile.jpg");
     setProfileThemeColor(profile.themeColor || "emerald");
+    setProfileLanguages((profile.languages || []).join(", "));
     
-    setProfileBio(profile.about.bio);
-    setProfileCurrentRole(profile.about.currentRole);
-    setProfileEduSummary(profile.about.educationSummary);
-    setProfileCareerFocus(profile.about.careerFocus);
-    setProfileInterests(profile.about.interests.join(", "));
+    setProfileBio(profile.about?.bio || "");
+    setProfileCurrentRole(profile.about?.currentRole || "");
+    setProfileEduSummary(profile.about?.educationSummary || "");
+    setProfileCareerFocus(profile.about?.careerFocus || "");
+    setProfileInterests((profile.about?.interests || []).join(", "));
 
-    setSocialGithub(profile.socials.github || "");
-    setSocialLinkedin(profile.socials.linkedin || "");
-    setSocialTwitter(profile.socials.twitter || "");
-    setSocialMedium(profile.socials.medium || "");
-    setSocialScholar(profile.socials.scholar || "");
+    setSocialGithub(profile.socials?.github || "");
+    setSocialLinkedin(profile.socials?.linkedin || "");
+    setSocialTwitter(profile.socials?.twitter || "");
+    setSocialMedium(profile.socials?.medium || "");
+    setSocialScholar(profile.socials?.scholar || "");
 
     const rawSkills = profile.skills;
     const initialSkills = Array.isArray(rawSkills) 
@@ -115,6 +175,43 @@ export default function AdminDashboardPage() {
     setSkillsList(initialSkills.map(c => ({
       title: c.title,
       items: c.items.join(", ")
+    })));
+
+    setProjectsList((profile.projects || []).map(p => ({
+      title: p.title || "",
+      description: p.description || "",
+      techStack: (p.techStack || []).join(", "),
+      keyImpact: p.keyImpact || "",
+      githubLink: p.githubLink || "",
+      liveLink: p.liveLink || "",
+      caseStudyLink: p.caseStudyLink || ""
+    })));
+
+    setExperienceList((profile.experience || []).map(e => ({
+      company: e.company || "",
+      role: e.role || "",
+      location: e.location || "",
+      dateRange: e.dateRange || "",
+      responsibilities: (e.responsibilities || []).join("\n"),
+      keyAchievements: (e.keyAchievements || []).join("\n")
+    })));
+
+    setEducationList((profile.education || []).map(ed => ({
+      university: ed.university || "",
+      degree: ed.degree || "",
+      department: ed.department || "",
+      dateRange: ed.dateRange || "",
+      location: ed.location || "",
+      coursework: (ed.coursework || []).join(", "),
+      focus: ed.focus || ""
+    })));
+
+    setCertificationsList((profile.certifications || []).map(c => ({
+      title: c.title || "",
+      issuer: c.issuer || "",
+      date: c.date || "",
+      url: c.url || "",
+      description: c.description || ""
     })));
   }, [router, profile]);
 
@@ -370,7 +467,13 @@ export default function AdminDashboardPage() {
       .map((i) => i.trim())
       .filter((i) => i.length > 0);
 
-    const updatedProfile = {
+    // Build languages list
+    const languages = profileLanguages
+      .split(",")
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    const updatedProfile: ProfileData = {
       ...profile,
       themeColor: profileThemeColor,
       name: profileName,
@@ -379,10 +482,12 @@ export default function AdminDashboardPage() {
       location: profileLocation,
       email: profileEmail,
       cvUrl: profileCvUrl,
+      profileImage: profileImage || "/images/profile.jpg",
+      languages,
       socials: {
         github: socialGithub,
         linkedin: socialLinkedin,
-        email: `mailto:${profileEmail}`,
+        email: profileEmail ? `mailto:${profileEmail}` : "",
         twitter: socialTwitter,
         medium: socialMedium,
         scholar: socialScholar
@@ -397,7 +502,40 @@ export default function AdminDashboardPage() {
       skills: skillsList.map(s => ({
         title: s.title.trim(),
         items: s.items.split(",").map(i => i.trim()).filter(i => i.length > 0)
-      })).filter(s => s.title.length > 0)
+      })).filter(s => s.title.length > 0),
+      projects: projectsList.map(p => ({
+        title: p.title.trim(),
+        description: p.description.trim(),
+        techStack: p.techStack.split(",").map(t => t.trim()).filter(t => t.length > 0),
+        keyImpact: p.keyImpact.trim(),
+        githubLink: p.githubLink.trim() || undefined,
+        liveLink: p.liveLink.trim() || undefined,
+        caseStudyLink: p.caseStudyLink.trim() || undefined
+      })).filter(p => p.title.length > 0),
+      experience: experienceList.map(e => ({
+        company: e.company.trim(),
+        role: e.role.trim(),
+        location: e.location.trim(),
+        dateRange: e.dateRange.trim(),
+        responsibilities: e.responsibilities.split("\n").map(r => r.trim()).filter(r => r.length > 0),
+        keyAchievements: e.keyAchievements.split("\n").map(a => a.trim()).filter(a => a.length > 0)
+      })).filter(e => e.company.length > 0 || e.role.length > 0),
+      education: educationList.map(ed => ({
+        university: ed.university.trim(),
+        degree: ed.degree.trim(),
+        department: ed.department.trim(),
+        dateRange: ed.dateRange.trim(),
+        location: ed.location.trim(),
+        coursework: ed.coursework ? ed.coursework.split(",").map(c => c.trim()).filter(c => c.length > 0) : undefined,
+        focus: ed.focus.trim() || undefined
+      })).filter(ed => ed.university.length > 0),
+      certifications: certificationsList.map(c => ({
+        title: c.title.trim(),
+        issuer: c.issuer.trim(),
+        date: c.date.trim(),
+        url: c.url.trim() || undefined,
+        description: c.description.trim() || undefined
+      })).filter(c => c.title.length > 0)
     };
 
     updateProfile(updatedProfile);
@@ -742,7 +880,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
                         Contact Email *
@@ -766,6 +904,19 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setProfileLocation(e.target.value)}
                         className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
                         placeholder="e.g. San Francisco, CA"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                        Profile Image URL
+                      </label>
+                      <input
+                        type="text"
+                        value={profileImage}
+                        onChange={(e) => setProfileImage(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="e.g. /images/profile.jpg"
                       />
                     </div>
 
@@ -818,7 +969,7 @@ export default function AdminDashboardPage() {
                 <div className="space-y-4 pt-4 border-t border-border-color/60">
                   <h3 className="font-mono text-xs text-accent-primary font-bold">// 2. About & Biography Details</h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
                         Current Role Summary
@@ -855,6 +1006,19 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setProfileInterests(e.target.value)}
                         className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
                         placeholder="e.g. LLMs, Go, WebGPU"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                        Languages (Comma Separated)
+                      </label>
+                      <input
+                        type="text"
+                        value={profileLanguages}
+                        onChange={(e) => setProfileLanguages(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="e.g. Turkish (Native), English (Fluent)"
                       />
                     </div>
                   </div>
@@ -1024,6 +1188,479 @@ export default function AdminDashboardPage() {
                     {skillsList.length === 0 && (
                       <p className="text-center font-mono text-[10px] text-text-tertiary py-4 bg-bg-secondary/20 rounded-xl border border-dashed border-border-color animate-fade-in">
                         No skill categories defined. Click "+ Add Category" to start.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 5. Featured Projects */}
+                <div className="space-y-4 pt-4 border-t border-border-color/60">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-mono text-xs text-accent-primary font-bold">// 5. Featured Projects</h3>
+                    <button
+                      type="button"
+                      onClick={() => setProjectsList(prev => [...prev, { title: "", description: "", techStack: "", keyImpact: "", githubLink: "", liveLink: "", caseStudyLink: "" }])}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono text-accent-primary hover:opacity-80 cursor-pointer"
+                    >
+                      + Add Project
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {projectsList.map((proj, idx) => (
+                      <div key={idx} className="p-4 rounded-xl border border-border-color bg-bg-secondary/40 space-y-3 relative group">
+                        <button
+                          type="button"
+                          onClick={() => setProjectsList(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-3 right-3 p-1 text-text-tertiary hover:text-red-500 rounded bg-bg-tertiary cursor-pointer transition-all"
+                          title="Delete Project"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pr-6">
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Project Title *
+                            </label>
+                            <input
+                              type="text"
+                              value={proj.title}
+                              onChange={(e) => setProjectsList(prev => prev.map((p, i) => i === idx ? { ...p, title: e.target.value } : p))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Gurme Restaurant Recommendation App"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Key Impact / Award
+                            </label>
+                            <input
+                              type="text"
+                              value={proj.keyImpact}
+                              onChange={(e) => setProjectsList(prev => prev.map((p, i) => i === idx ? { ...p, keyImpact: e.target.value } : p))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Awarded 5th place out of 35 engineering projects"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-12">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Tech Stack (Comma Separated)
+                            </label>
+                            <input
+                              type="text"
+                              value={proj.techStack}
+                              onChange={(e) => setProjectsList(prev => prev.map((p, i) => i === idx ? { ...p, techStack: e.target.value } : p))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Java, Spring Boot, PostgreSQL, Docker"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-12">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Description Summary
+                            </label>
+                            <textarea
+                              rows={2}
+                              value={proj.description}
+                              onChange={(e) => setProjectsList(prev => prev.map((p, i) => i === idx ? { ...p, description: e.target.value } : p))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary resize-none"
+                              placeholder="Detailed summary of architecture and feature highlights..."
+                            />
+                          </div>
+
+                          <div className="sm:col-span-4">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              GitHub Repo URL
+                            </label>
+                            <input
+                              type="text"
+                              value={proj.githubLink}
+                              onChange={(e) => setProjectsList(prev => prev.map((p, i) => i === idx ? { ...p, githubLink: e.target.value } : p))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="https://github.com/username/repo"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-4">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Live Demo URL
+                            </label>
+                            <input
+                              type="text"
+                              value={proj.liveLink}
+                              onChange={(e) => setProjectsList(prev => prev.map((p, i) => i === idx ? { ...p, liveLink: e.target.value } : p))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="https://project.com"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-4">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Case Study URL
+                            </label>
+                            <input
+                              type="text"
+                              value={proj.caseStudyLink}
+                              onChange={(e) => setProjectsList(prev => prev.map((p, i) => i === idx ? { ...p, caseStudyLink: e.target.value } : p))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="/blog/case-study"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {projectsList.length === 0 && (
+                      <p className="text-center font-mono text-[10px] text-text-tertiary py-4 bg-bg-secondary/20 rounded-xl border border-dashed border-border-color">
+                        No projects defined. Click "+ Add Project" to start.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 6. Work Experience */}
+                <div className="space-y-4 pt-4 border-t border-border-color/60">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-mono text-xs text-accent-primary font-bold">// 6. Work Experience</h3>
+                    <button
+                      type="button"
+                      onClick={() => setExperienceList(prev => [...prev, { company: "", role: "", location: "", dateRange: "", responsibilities: "", keyAchievements: "" }])}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono text-accent-primary hover:opacity-80 cursor-pointer"
+                    >
+                      + Add Experience
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {experienceList.map((exp, idx) => (
+                      <div key={idx} className="p-4 rounded-xl border border-border-color bg-bg-secondary/40 space-y-3 relative group">
+                        <button
+                          type="button"
+                          onClick={() => setExperienceList(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-3 right-3 p-1 text-text-tertiary hover:text-red-500 rounded bg-bg-tertiary cursor-pointer transition-all"
+                          title="Delete Experience"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pr-6">
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Company Name *
+                            </label>
+                            <input
+                              type="text"
+                              value={exp.company}
+                              onChange={(e) => setExperienceList(prev => prev.map((item, i) => i === idx ? { ...item, company: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. IT KRAFT"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Role Title *
+                            </label>
+                            <input
+                              type="text"
+                              value={exp.role}
+                              onChange={(e) => setExperienceList(prev => prev.map((item, i) => i === idx ? { ...item, role: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Backend Developer"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Location
+                            </label>
+                            <input
+                              type="text"
+                              value={exp.location}
+                              onChange={(e) => setExperienceList(prev => prev.map((item, i) => i === idx ? { ...item, location: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Ankara, Turkey"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Date Range
+                            </label>
+                            <input
+                              type="text"
+                              value={exp.dateRange}
+                              onChange={(e) => setExperienceList(prev => prev.map((item, i) => i === idx ? { ...item, dateRange: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. September 2024 - Present"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-12">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Responsibilities (One per line)
+                            </label>
+                            <textarea
+                              rows={3}
+                              value={exp.responsibilities}
+                              onChange={(e) => setExperienceList(prev => prev.map((item, i) => i === idx ? { ...item, responsibilities: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary resize-none font-mono"
+                              placeholder="Designed microservices REST APIs&#10;Containerized applications via Docker"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-12">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Key Achievements (One per line)
+                            </label>
+                            <textarea
+                              rows={2}
+                              value={exp.keyAchievements}
+                              onChange={(e) => setExperienceList(prev => prev.map((item, i) => i === idx ? { ...item, keyAchievements: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary resize-none font-mono"
+                              placeholder="Successfully launched gift card microservices&#10;Integrated Elasticsearch real-time transactional search"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {experienceList.length === 0 && (
+                      <p className="text-center font-mono text-[10px] text-text-tertiary py-4 bg-bg-secondary/20 rounded-xl border border-dashed border-border-color">
+                        No work experience defined. Click "+ Add Experience" to start.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 7. Academic Education */}
+                <div className="space-y-4 pt-4 border-t border-border-color/60">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-mono text-xs text-accent-primary font-bold">// 7. Academic Education</h3>
+                    <button
+                      type="button"
+                      onClick={() => setEducationList(prev => [...prev, { university: "", degree: "", department: "", dateRange: "", location: "", coursework: "", focus: "" }])}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono text-accent-primary hover:opacity-80 cursor-pointer"
+                    >
+                      + Add Education
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {educationList.map((edu, idx) => (
+                      <div key={idx} className="p-4 rounded-xl border border-border-color bg-bg-secondary/40 space-y-3 relative group">
+                        <button
+                          type="button"
+                          onClick={() => setEducationList(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-3 right-3 p-1 text-text-tertiary hover:text-red-500 rounded bg-bg-tertiary cursor-pointer transition-all"
+                          title="Delete Education"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pr-6">
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              University / School *
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.university}
+                              onChange={(e) => setEducationList(prev => prev.map((item, i) => i === idx ? { ...item, university: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Middle East Technical University (METU)"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Degree Title
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.degree}
+                              onChange={(e) => setEducationList(prev => prev.map((item, i) => i === idx ? { ...item, degree: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Bachelor of Science (B.S.)"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-4">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Department / Major
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.department}
+                              onChange={(e) => setEducationList(prev => prev.map((item, i) => i === idx ? { ...item, department: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Computer Engineering"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-4">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Date Range
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.dateRange}
+                              onChange={(e) => setEducationList(prev => prev.map((item, i) => i === idx ? { ...item, dateRange: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. 2022 - 2026"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-4">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Location
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.location}
+                              onChange={(e) => setEducationList(prev => prev.map((item, i) => i === idx ? { ...item, location: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Ankara, Turkey"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-12">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Relevant Coursework (Comma Separated)
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.coursework}
+                              onChange={(e) => setEducationList(prev => prev.map((item, i) => i === idx ? { ...item, coursework: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Data Structures, Operating Systems, Machine Learning"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-12">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Focus Area / Thesis Summary
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.focus}
+                              onChange={(e) => setEducationList(prev => prev.map((item, i) => i === idx ? { ...item, focus: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Backend microservices, database systems, and AI."
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {educationList.length === 0 && (
+                      <p className="text-center font-mono text-[10px] text-text-tertiary py-4 bg-bg-secondary/20 rounded-xl border border-dashed border-border-color">
+                        No education items defined. Click "+ Add Education" to start.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 8. Certifications & Awards */}
+                <div className="space-y-4 pt-4 border-t border-border-color/60">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-mono text-xs text-accent-primary font-bold">// 8. Certifications & Awards</h3>
+                    <button
+                      type="button"
+                      onClick={() => setCertificationsList(prev => [...prev, { title: "", issuer: "", date: "", url: "", description: "" }])}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono text-accent-primary hover:opacity-80 cursor-pointer"
+                    >
+                      + Add Certification
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {certificationsList.map((cert, idx) => (
+                      <div key={idx} className="p-4 rounded-xl border border-border-color bg-bg-secondary/40 space-y-3 relative group">
+                        <button
+                          type="button"
+                          onClick={() => setCertificationsList(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-3 right-3 p-1 text-text-tertiary hover:text-red-500 rounded bg-bg-tertiary cursor-pointer transition-all"
+                          title="Delete Certification"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pr-6">
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Award / Certification Title *
+                            </label>
+                            <input
+                              type="text"
+                              value={cert.title}
+                              onChange={(e) => setCertificationsList(prev => prev.map((item, i) => i === idx ? { ...item, title: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. METU-CENG Demo Day 2025 – 5th Place Award"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Issuer / Organization
+                            </label>
+                            <input
+                              type="text"
+                              value={cert.issuer}
+                              onChange={(e) => setCertificationsList(prev => prev.map((item, i) => i === idx ? { ...item, issuer: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. Middle East Technical University"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-4">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Date Issued
+                            </label>
+                            <input
+                              type="text"
+                              value={cert.date}
+                              onChange={(e) => setCertificationsList(prev => prev.map((item, i) => i === idx ? { ...item, date: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="e.g. 2025"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-8">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Credential Verification URL
+                            </label>
+                            <input
+                              type="text"
+                              value={cert.url}
+                              onChange={(e) => setCertificationsList(prev => prev.map((item, i) => i === idx ? { ...item, url: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                              placeholder="https://verify.credential.org/..."
+                            />
+                          </div>
+
+                          <div className="sm:col-span-12">
+                            <label className="block text-[9px] font-bold text-text-tertiary uppercase tracking-wider mb-1 font-mono">
+                              Description Summary
+                            </label>
+                            <textarea
+                              rows={2}
+                              value={cert.description}
+                              onChange={(e) => setCertificationsList(prev => prev.map((item, i) => i === idx ? { ...item, description: e.target.value } : item))}
+                              className="w-full px-3 py-1.5 rounded border border-border-color bg-bg-primary text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-accent-primary resize-none"
+                              placeholder="Ranked 5th out of 35 engineering projects..."
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {certificationsList.length === 0 && (
+                      <p className="text-center font-mono text-[10px] text-text-tertiary py-4 bg-bg-secondary/20 rounded-xl border border-dashed border-border-color">
+                        No certifications defined. Click "+ Add Certification" to start.
                       </p>
                     )}
                   </div>
