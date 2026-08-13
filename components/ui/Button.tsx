@@ -18,7 +18,11 @@ export default function Button({
   children,
   ...props
 }: ButtonProps) {
-  const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
+  const baseStyles =
+    "press-motion inline-flex items-center justify-center font-medium rounded-lg " +
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary " +
+    "focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)] " +
+    "disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97]";
   
   const variants = {
     primary: "bg-gradient-to-r from-accent-primary to-accent-secondary text-white hover:opacity-95 shadow-md shadow-accent-primary/10 hover:shadow-lg hover:shadow-accent-primary/20 border border-transparent",

@@ -6,6 +6,7 @@ import { Github, Linkedin, Mail, Twitter, BookOpen, GraduationCap, ArrowDown, Te
 import { useProfile } from "../ProfileContext";
 import { useLanguage } from "../LanguageContext";
 import { translations } from "@/data/profile";
+import { scrollToSection } from "@/lib/scroll";
 
 interface CommandLog {
   cmd: string;
@@ -36,7 +37,7 @@ export default function Hero() {
       {
         cmd: "neofetch",
         output: (
-          <div className="flex gap-4 font-mono text-[10px] text-text-secondary leading-normal leading-relaxed animate-fade-in select-none">
+          <div className="flex gap-4 font-mono type-caption text-text-secondary animate-fade-in select-none">
             <pre className="text-accent-primary shrink-0 hidden sm:block">
               {`   /\\_/\\
   ( o.o )
@@ -62,17 +63,6 @@ export default function Hero() {
     ]);
   }, [profile, language]);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offsetTop = element.offsetTop - 80;
-      window.scrollTo({
-        top: offsetTop,
-        behavior: "smooth"
-      });
-    }
-  };
-
   const handleCommandSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanCmd = input.trim().toLowerCase();
@@ -83,7 +73,7 @@ export default function Hero() {
     switch (cleanCmd) {
       case "help":
         response = (
-          <div className="space-y-1 font-mono text-[10px] text-text-secondary">
+          <div className="space-y-1 font-mono type-caption text-text-secondary">
             <p className="text-text-primary font-semibold">// CLI utility commands:</p>
             <p><span className="text-accent-primary">neofetch</span> - System specs & info.</p>
             <p><span className="text-accent-primary">about</span>    - Display summary bio.</p>
@@ -96,7 +86,7 @@ export default function Hero() {
         break;
       case "about":
         response = (
-          <p className="font-mono text-[10px] text-text-secondary max-w-sm leading-relaxed">
+          <p className="font-mono type-caption text-text-secondary max-w-sm leading-relaxed">
             {profile.about.bio}
           </p>
         );
@@ -111,7 +101,7 @@ export default function Hero() {
               { title: "Databases", items: (rawSkills as any)?.databases || [] }
             ];
           response = (
-            <div className="font-mono text-[10px] text-text-secondary space-y-1">
+            <div className="font-mono type-caption text-text-secondary space-y-1">
               {categoriesList.slice(0, 4).map((c, i) => (
                 <p key={i}>
                   <span className="text-accent-secondary font-bold">
@@ -125,7 +115,7 @@ export default function Hero() {
         break;
       case "projects":
         response = (
-          <div className="font-mono text-[10px] text-text-secondary space-y-1">
+          <div className="font-mono type-caption text-text-secondary space-y-1">
             {profile.projects.slice(0, 3).map((p, i) => (
               <p key={i}>• <span className="text-text-primary font-bold">{p.title}</span> - {p.keyImpact}</p>
             ))}
@@ -134,7 +124,7 @@ export default function Hero() {
         break;
       case "socials":
         response = (
-          <div className="font-mono text-[10px] text-text-secondary space-y-1">
+          <div className="font-mono type-caption text-text-secondary space-y-1">
             {socials.github && <p>• GitHub: <a href={socials.github} target="_blank" rel="noreferrer" className="text-accent-primary underline">github.com</a></p>}
             {socials.linkedin && <p>• LinkedIn: <a href={socials.linkedin} target="_blank" rel="noreferrer" className="text-accent-primary underline">linkedin.com</a></p>}
           </div>
@@ -145,7 +135,7 @@ export default function Hero() {
         setInput("");
         return;
       default:
-        response = <span className="text-red-400 font-mono text-[10px]">{`// COMMAND_NOT_FOUND: "${cleanCmd}". Type 'help' for options.`}</span>;
+        response = <span className="text-red-400 font-mono type-caption">{`// COMMAND_NOT_FOUND: "${cleanCmd}". Type 'help' for options.`}</span>;
     }
 
     setHistory((prev) => [...prev, { cmd: input, output: response }]);
@@ -171,16 +161,18 @@ export default function Hero() {
             {language === "tr" ? "Yeni fırsatlara açık" : "Available for new opportunities"}
           </span>
 
-          <h1 className="font-display font-bold text-4xl md:text-6xl tracking-tight text-text-primary leading-tight">
+          <h1 className="font-display font-bold text-4xl md:text-6xl type-display text-text-primary">
             {language === "tr" ? "Merhaba, Ben " : "Hi, I'm "}
             <span className="text-gradient">{profile.name}</span>
           </h1>
 
-          <h2 className="font-display font-medium text-lg md:text-2xl text-text-secondary tracking-wide font-mono">
+          {/* Tracking tightens as type grows; the previous `tracking-wide` here
+              pushed a 2xl heading the wrong direction. */}
+          <h2 className="font-display font-medium text-lg md:text-2xl text-text-secondary type-title font-mono">
             {`const developer = "${profile.title}";`}
           </h2>
 
-          <p className="text-sm md:text-base text-text-tertiary max-w-xl leading-relaxed font-normal">
+          <p className="text-sm md:text-base text-text-tertiary max-w-xl type-body font-normal">
             {profile.tagline}
           </p>
 
@@ -205,7 +197,7 @@ export default function Hero() {
                 href={socials.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-secondary hover:text-accent-primary hover:scale-110 transition-all duration-200"
+                className="press-motion text-text-secondary hover:text-accent-primary hover:scale-110 active:scale-95"
                 aria-label="GitHub Profile"
               >
                 <Github size={18} />
@@ -216,7 +208,7 @@ export default function Hero() {
                 href={socials.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-secondary hover:text-accent-primary hover:scale-110 transition-all duration-200"
+                className="press-motion text-text-secondary hover:text-accent-primary hover:scale-110 active:scale-95"
                 aria-label="LinkedIn Profile"
               >
                 <Linkedin size={18} />
@@ -225,7 +217,7 @@ export default function Hero() {
             {socials.email && (
               <a
                 href={socials.email}
-                className="text-text-secondary hover:text-accent-primary hover:scale-110 transition-all duration-200"
+                className="press-motion text-text-secondary hover:text-accent-primary hover:scale-110 active:scale-95"
                 aria-label="Email Contact"
               >
                 <Mail size={18} />
@@ -236,7 +228,7 @@ export default function Hero() {
                 href={socials.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-secondary hover:text-accent-primary hover:scale-110 transition-all duration-200"
+                className="press-motion text-text-secondary hover:text-accent-primary hover:scale-110 active:scale-95"
                 aria-label="Twitter Profile"
               >
                 <Twitter size={18} />
@@ -247,7 +239,7 @@ export default function Hero() {
                 href={socials.medium}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-secondary hover:text-accent-primary hover:scale-110 transition-all duration-200"
+                className="press-motion text-text-secondary hover:text-accent-primary hover:scale-110 active:scale-95"
                 aria-label="Medium Blog"
               >
                 <BookOpen size={18} />
@@ -258,7 +250,7 @@ export default function Hero() {
                 href={socials.scholar}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-secondary hover:text-accent-primary hover:scale-110 transition-all duration-200"
+                className="press-motion text-text-secondary hover:text-accent-primary hover:scale-110 active:scale-95"
                 aria-label="Google Scholar Profile"
               >
                 <GraduationCap size={18} />
@@ -269,7 +261,7 @@ export default function Hero() {
 
         {/* Right Column: Terminal Widget */}
         <div className="lg:col-span-5 w-full">
-          <div className="rounded-xl border border-border-color bg-bg-secondary/90 backdrop-blur-md shadow-card overflow-hidden w-full max-w-lg mx-auto">
+          <div className="material rounded-xl border border-border-color shadow-card overflow-hidden w-full max-w-lg mx-auto">
             {/* Window bar */}
             <div className="flex items-center justify-between px-4 py-2.5 bg-bg-tertiary border-b border-border-color">
               <div className="flex items-center gap-1.5">
@@ -277,7 +269,7 @@ export default function Hero() {
                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
                 <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
               </div>
-              <span className="font-mono text-[10px] font-semibold text-text-tertiary select-none flex items-center gap-1">
+              <span className="font-mono type-caption font-semibold text-text-tertiary select-none flex items-center gap-1">
                 <Terminal size={11} className="text-accent-primary" />
                 tahsin@macbook-pro:~
               </span>
@@ -291,7 +283,7 @@ export default function Hero() {
             >
               {history.map((log, idx) => (
                 <div key={idx} className="space-y-1.5">
-                  <p className="font-mono text-[10px] text-text-primary">
+                  <p className="font-mono type-caption text-text-primary">
                     <span className="text-accent-primary font-bold">tahsin@core:~$</span> {log.cmd}
                   </p>
                   <div className="pl-3">{log.output}</div>
@@ -301,14 +293,14 @@ export default function Hero() {
 
             {/* Command input prompt */}
             <form onSubmit={handleCommandSubmit} className="flex items-center px-4 py-2.5 border-t border-border-color bg-bg-tertiary/50">
-              <span className="font-mono text-[10px] text-accent-primary font-bold mr-1.5 select-none">
+              <span className="font-mono type-caption text-accent-primary font-bold mr-1.5 select-none">
                 tahsin@core:~$
               </span>
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="w-full bg-transparent border-none text-text-primary text-[10px] font-mono focus:outline-none focus:ring-0 p-0"
+                className="w-full bg-transparent border-none text-text-primary type-caption font-mono focus:outline-none focus:ring-0 p-0"
                 placeholder="Try: help, skills, about..."
                 autoComplete="off"
                 autoCorrect="off"

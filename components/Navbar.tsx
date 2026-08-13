@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTheme } from "./ThemeContext";
 import { Sun, Moon, Menu, X, Globe } from "lucide-react";
 import { useProfile } from "./ProfileContext";
 import { useLanguage } from "./LanguageContext";
 import { translations } from "@/data/profile";
+import { scrollToSection } from "@/lib/scroll";
+import Sheet from "./ui/Sheet";
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -41,41 +43,54 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Monitor scroll for visual changes to navbar and active section tracking
+  // Scroll only decides whether the chrome is floating over content. Coalesced
+  // into one rAF so a fast scroll cannot queue more work than it can paint.
+  const scrollFrame = useRef(0);
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-
-      // Section tracking
-      const scrollPosition = window.scrollY + 100; // Offset for navbar height
-      
-      for (const item of navItems) {
-        const element = document.getElementById(item.id);
-        if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetHeight = element.offsetHeight;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(item.id);
-          }
-        }
-      }
+      if (scrollFrame.current) return;
+      scrollFrame.current = requestAnimationFrame(() => {
+        scrollFrame.current = 0;
+        setIsScrolled(window.scrollY > 20);
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [language]);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollFrame.current) cancelAnimationFrame(scrollFrame.current);
+    };
+  }, []);
 
-  const scrollToSection = (id: string) => {
+  // Active section comes from an observer rather than a per-scroll-event loop
+  // over every section's offsetTop, which forced layout on every frame.
+  const sectionIds = navItems.map((item) => item.id).join(",");
+  useEffect(() => {
+    const ids = sectionIds.split(",");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActiveSection(visible.target.id);
+      },
+      // Band just under the navbar, so a section counts as active once it owns
+      // the part of the viewport the reader is actually looking at.
+      { rootMargin: "-80px 0px -55% 0px", threshold: [0, 0.25, 0.5, 1] }
+    );
+
+    ids.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
+    return () => observer.disconnect();
+  }, [sectionIds]);
+
+  const goToSection = (id: string) => {
     setIsMobileMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      const offsetTop = element.offsetTop - 80; // Offset for navbar
-      window.scrollTo({
-        top: offsetTop,
-        behavior: "smooth"
-      });
-      setActiveSection(id);
-    }
+    scrollToSection(id);
+    setActiveSection(id);
   };
 
   // Get user's initials for the logo
@@ -86,17 +101,16 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-bg-primary/80 backdrop-blur-md border-b border-border-color py-4"
-          : "bg-transparent py-6"
+      data-scrolled={isScrolled}
+      className={`scroll-edge fixed top-0 left-0 right-0 z-50 transition-[padding,background-color] duration-300 ease-settle ${
+        isScrolled ? "material py-4" : "bg-transparent py-6"
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
         {/* Logo / Initials */}
         <button
-          onClick={() => scrollToSection("home")}
-          className="font-display font-bold text-xl tracking-tight text-gradient cursor-pointer active:scale-95 transition-transform"
+          onClick={() => goToSection("home")}
+          className="press-motion font-display font-bold text-xl type-title text-gradient cursor-pointer active:scale-95"
         >
           {initials}
           <span className="text-text-primary">.</span>
@@ -107,8 +121,8 @@ export default function Navbar() {
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => scrollToSection(item.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+              onClick={() => goToSection(item.id)}
+              className={`press-motion on-material px-4 py-2 rounded-lg text-sm cursor-pointer active:scale-[0.97] ${
                 activeSection === item.id
                   ? "text-accent-primary bg-accent-muted/40 dark:bg-accent-muted/10 font-semibold"
                   : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
@@ -122,7 +136,7 @@ export default function Navbar() {
           <button
             onClick={toggleLanguage}
             aria-label="Toggle Language"
-            className="flex items-center space-x-1 px-3 py-1.5 ml-2 rounded-lg text-xs font-bold border border-border-color text-text-secondary hover:text-accent-primary hover:border-accent-primary transition-all duration-200 cursor-pointer active:scale-95"
+            className="press-motion flex items-center space-x-1 px-3 py-1.5 ml-2 rounded-lg text-xs font-bold border border-border-color text-text-secondary hover:text-accent-primary hover:border-accent-primary cursor-pointer active:scale-95"
           >
             <Globe size={14} />
             <span>{language.toUpperCase()}</span>
@@ -132,7 +146,7 @@ export default function Navbar() {
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="p-2 ml-1 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all duration-200 cursor-pointer active:scale-90"
+            className="press-motion p-2 ml-1 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary cursor-pointer active:scale-90"
           >
             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
@@ -144,7 +158,7 @@ export default function Navbar() {
           <button
             onClick={toggleLanguage}
             aria-label="Toggle Language"
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold border border-border-color text-text-secondary hover:text-accent-primary transition-all"
+            className="press-motion flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold border border-border-color text-text-secondary hover:text-accent-primary active:scale-95"
           >
             <Globe size={14} />
             <span>{language.toUpperCase()}</span>
@@ -154,7 +168,7 @@ export default function Navbar() {
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all"
+            className="press-motion p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary active:scale-90"
           >
             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
@@ -163,33 +177,37 @@ export default function Navbar() {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle navigation menu"
-            className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all"
+            aria-expanded={isMobileMenuOpen}
+            className="press-motion p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary active:scale-90"
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-bg-secondary border-b border-border-color shadow-lg animate-fade-in">
-          <nav className="flex flex-col p-4 space-y-1">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className={`px-4 py-3 rounded-lg text-left text-sm font-medium transition-all ${
-                  activeSection === item.id
-                    ? "text-accent-primary bg-accent-muted/40 dark:bg-accent-muted/10 font-semibold"
-                    : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      )}
+      {/* Mobile navigation. A sheet rather than a dropdown, so it can be
+          dismissed with the same gesture that would dismiss it on iOS. */}
+      <Sheet
+        open={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        label="Navigation"
+      >
+        <nav className="flex flex-col p-4 pb-6 space-y-1">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => goToSection(item.id)}
+              className={`press-motion on-material px-4 py-3 rounded-lg text-left text-sm active:scale-[0.98] ${
+                activeSection === item.id
+                  ? "text-accent-primary bg-accent-muted/40 dark:bg-accent-muted/10 font-semibold"
+                  : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+      </Sheet>
     </header>
   );
 }

@@ -16,8 +16,8 @@ export default function Card({
   return (
     <div
       className={`
-        rounded-xl border border-border-color bg-bg-secondary p-6 shadow-card transition-all duration-300
-        ${glassmorphism ? "backdrop-blur-md bg-opacity-70 dark:bg-opacity-40" : ""}
+        press-motion rounded-xl border border-border-color p-6 shadow-card
+        ${glassmorphism ? "material" : "bg-bg-secondary"}
         ${hoverEffect ? "hover:scale-[1.01] hover:shadow-card-hover hover:border-accent-primary/40 dark:hover:border-accent-primary/30" : ""}
         ${className}
       `}

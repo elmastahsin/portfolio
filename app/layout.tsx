@@ -89,6 +89,16 @@ export default async function RootLayout({
       className={`${inter.variable} ${jetbrains.variable} h-full scroll-smooth`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Runs before first paint, so the stored theme is already on <html>
+            when the page renders. Resolving this in an effect instead is what
+            made light-theme users see a dark flash on every load. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");if(!t){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.classList.toggle("dark",t==="dark")}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary antialiased cyber-grid">
         <LanguageProvider>
           <ThemeProvider>

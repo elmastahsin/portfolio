@@ -3,6 +3,23 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* Motion: durations map to Apple's "response", easings to damping ratio.
+     press = instant touch-down feedback; base = response 0.3-0.4s. */
+  --dur-press: 100ms;
+  --dur-fast: 200ms;
+  --dur-base: 320ms;
+  --dur-slow: 400ms;
+  /* Easings live in @theme below so they also emit `ease-*` utilities. */
+
+  /* Translucent material. Alpha + blur are separate so the reduced-transparency
+     fallback can solidify the surface without touching layout. */
+  --material-bg: rgba(249, 250, 251, 0.72);
+  --material-blur: 20px;
+  --material-saturate: 180%;
+  --material-edge: rgba(255, 255, 255, 0.55);
+
+  --focus-ring-offset: #f9fafb;
+
   --bg-primary: #f9fafb;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f3f4f6;
@@ -36,6 +53,10 @@
 }
 
 html.dark {
+  --material-bg: rgba(13, 18, 31, 0.72);
+  --material-edge: rgba(255, 255, 255, 0.08);
+  --focus-ring-offset: #080b11;
+
   --bg-primary: #080b11; /* Extreme Dark Charcoal Slate */
   --bg-secondary: #0d121f; /* Editor Dark Slate */
   --bg-tertiary: #171f30; /* Terminal dark */
@@ -134,6 +155,13 @@ html.dark.theme-red {
   --font-mono: var(--font-jetbrains), monospace;
   --font-display: var(--font-jetbrains), monospace;
 
+  /* damping 1.0 - settles without overshoot. Default for everything. */
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  /* damping ~0.8 - slight overshoot. Only where a gesture carried momentum. */
+  --ease-momentum: cubic-bezier(0.34, 1.36, 0.64, 1);
+  /* mirrored inverse of --ease-settle, for the return leg of a reversible transition */
+  --ease-settle-in: cubic-bezier(0.64, 0, 0.78, 0);
+
   /* Custom badge theme colors */
   --color-badge-indigo-bg: var(--badge-indigo-bg);
   --color-badge-indigo-text: var(--badge-indigo-text);
@@ -156,8 +184,97 @@ html.dark.theme-red {
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
-  scroll-behavior: smooth;
+  font-optical-sizing: auto;
+}
+
+/* Theme change eases across every surface, not just <body>, so light<->dark is a
+   fade rather than an abrupt brightness jump (Apple: avoid abrupt luminance steps).
+   Scoped to a transient class so it never taxes normal interaction. */
+html.theme-changing,
+html.theme-changing *,
+html.theme-changing *::before,
+html.theme-changing *::after {
+  transition:
+    background-color var(--dur-slow) var(--ease-settle),
+    border-color var(--dur-slow) var(--ease-settle),
+    color var(--dur-slow) var(--ease-settle),
+    fill var(--dur-slow) var(--ease-settle) !important;
+  transition-delay: 0ms !important;
+}
+
+/* Type: tracking and leading are size-specific. Large text reads too loose as it
+   grows, so it tightens; small text needs the opposite. Never one fixed value. */
+.type-display {
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+.type-title {
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+.type-body {
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+/* Small mono/caption text: slight positive tracking buys legibility. */
+.type-caption {
+  font-size: 0.6875rem; /* scales with the user's text-size setting, unlike 10px */
+  line-height: 1.55;
+  letter-spacing: 0.015em;
+}
+/* Vibrancy: text sitting on a translucent surface needs more weight and a touch
+   more tracking than the same text on a solid one, or it dissolves into the blur. */
+.on-material {
+  letter-spacing: 0.005em;
+  font-weight: 500;
+}
+
+/* Translucent chrome. Content scrolls underneath rather than being clipped by an
+   opaque strip. */
+.material {
+  background-color: var(--material-bg);
+  backdrop-filter: blur(var(--material-blur)) saturate(var(--material-saturate));
+  -webkit-backdrop-filter: blur(var(--material-blur)) saturate(var(--material-saturate));
+}
+/* Bigger surfaces read as thicker glass. */
+.material-thick {
+  --material-blur: 32px;
+  box-shadow: 0 -8px 40px -8px rgba(0, 0, 0, 0.28);
+}
+/* A bright top edge is light catching the material. */
+.material-edge-top {
+  border-top: 1px solid var(--material-edge);
+}
+
+/* Press feedback rides its own fast timing. Bundling transform into the same
+   300ms as colour and shadow is what makes a button feel laggy on touch-down,
+   and response is the foundation everything else is built on. */
+.press-motion {
+  transition:
+    transform var(--dur-press) var(--ease-settle),
+    background-color var(--dur-base) var(--ease-settle),
+    border-color var(--dur-base) var(--ease-settle),
+    box-shadow var(--dur-base) var(--ease-settle),
+    color var(--dur-base) var(--ease-settle),
+    opacity var(--dur-base) var(--ease-settle);
+}
+
+/* Scroll edge effect: a short fade where floating chrome overlaps content,
+   instead of a 1px rule that reads as a hard seam. */
+.scroll-edge::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 24px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--material-bg), transparent);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-settle);
+}
+.scroll-edge[data-scrolled="true"]::after {
+  opacity: 1;
 }
 
 /* Cyber Engineering Grid Background */
@@ -234,7 +351,7 @@ html.dark .cyber-grid {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn var(--dur-slow) var(--ease-settle) both;
 }
 
 .animate-delay-100 {
@@ -247,4 +364,89 @@ html.dark .cyber-grid {
 
 .animate-delay-300 {
   animation-delay: 300ms;
+}
+
+/* ---------------------------------------------------------------------------
+   Accessibility preferences. Three independent signals, handled independently.
+   Reduced motion is not "no feedback" - it is a non-vestibular equivalent.
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Kill translation and scaling; keep opacity and color, which still carry
+     meaning without moving anything through the visual field. */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation-duration: var(--dur-fast);
+  }
+
+  /* Looping oscillation near 0.2Hz is the exact pattern that triggers
+     vestibular symptoms. Both of these are infinite loops. */
+  .animate-bounce,
+  .animate-pulse {
+    animation: none !important;
+  }
+
+  /* Any element still animating gets a short cross-fade at most. Overshoot
+     easings become linear so nothing springs past its target. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: var(--dur-fast) !important;
+    transition-timing-function: linear !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Overrides the blanket rule above: opacity cross-fades are the substitute,
+     so they keep a real duration. */
+  .animate-fade-in {
+    animation-duration: var(--dur-fast) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --material-bg: #ffffff;
+    --material-blur: 0px;
+    --material-saturate: 100%;
+  }
+  html.dark {
+    --material-bg: #0d121f;
+  }
+  .material {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --material-bg: #ffffff;
+    --material-blur: 0px;
+    --text-tertiary: #4b5563;
+    --border-color: #6b7280;
+  }
+  html.dark {
+    --material-bg: #05070c;
+    --text-tertiary: #cbd5e1;
+    --border-color: #94a3b8;
+  }
+  .material {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--border-color);
+  }
 }
