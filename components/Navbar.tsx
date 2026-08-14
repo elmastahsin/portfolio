@@ -25,7 +25,7 @@ export default function Navbar() {
           setHasBlogs(true);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const navItems = [
@@ -94,7 +94,7 @@ export default function Navbar() {
   };
 
   // Get user's initials for the logo
-  const initials = profile.name
+  const initials = "tahsinelmas."
     .split(" ")
     .map((n) => n[0])
     .join("");
@@ -102,9 +102,8 @@ export default function Navbar() {
   return (
     <header
       data-scrolled={isScrolled}
-      className={`scroll-edge fixed top-0 left-0 right-0 z-50 transition-[padding,background-color] duration-300 ease-settle ${
-        isScrolled ? "material py-4" : "bg-transparent py-6"
-      }`}
+      className={`scroll-edge fixed top-0 left-0 right-0 z-50 transition-[padding,background-color] duration-300 ease-settle ${isScrolled ? "material py-4" : "bg-transparent py-6"
+        }`}
     >
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
         {/* Logo / Initials */}
@@ -122,11 +121,10 @@ export default function Navbar() {
             <button
               key={item.id}
               onClick={() => goToSection(item.id)}
-              className={`press-motion on-material px-4 py-2 rounded-lg text-sm cursor-pointer active:scale-[0.97] ${
-                activeSection === item.id
+              className={`press-motion on-material px-4 py-2 rounded-lg text-sm cursor-pointer active:scale-[0.97] ${activeSection === item.id
                   ? "text-accent-primary bg-accent-muted/40 dark:bg-accent-muted/10 font-semibold"
                   : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
-              }`}
+                }`}
             >
               {item.label}
             </button>
@@ -197,11 +195,10 @@ export default function Navbar() {
             <button
               key={item.id}
               onClick={() => goToSection(item.id)}
-              className={`press-motion on-material px-4 py-3 rounded-lg text-left text-sm active:scale-[0.98] ${
-                activeSection === item.id
+              className={`press-motion on-material px-4 py-3 rounded-lg text-left text-sm active:scale-[0.98] ${activeSection === item.id
                   ? "text-accent-primary bg-accent-muted/40 dark:bg-accent-muted/10 font-semibold"
                   : "text-text-secondary hover:text-text-primary hover:bg-bg-tertiary"
-              }`}
+                }`}
             >
               {item.label}
             </button>
