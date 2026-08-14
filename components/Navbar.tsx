@@ -93,25 +93,20 @@ export default function Navbar() {
     setActiveSection(id);
   };
 
-  // Get user's initials for the logo
-  const initials = "tahsinelmas."
-    .split(" ")
-    .map((n) => n[0])
-    .join("");
-
   return (
     <header
       data-scrolled={isScrolled}
-      className={`scroll-edge fixed top-0 left-0 right-0 z-50 transition-[padding,background-color] duration-300 ease-settle ${isScrolled ? "material py-4" : "bg-transparent py-6"
-        }`}
+      className={`scroll-edge fixed top-0 left-0 right-0 z-50 transition-[padding,background-color] duration-300 ease-settle ${
+        isScrolled ? "material py-4" : "bg-transparent py-6"
+      }`}
     >
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-        {/* Logo / Initials */}
+        {/* Logo */}
         <button
-          onClick={() => goToSection("home")} s
+          onClick={() => goToSection("home")}
           className="press-motion font-display font-bold text-xl type-title text-gradient cursor-pointer active:scale-95"
         >
-          {initials}
+          tahsinelmas
           <span className="text-text-primary">.</span>
         </button>
 
