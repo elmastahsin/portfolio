@@ -4,6 +4,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Terminal, ArrowLeft } from "lucide-react";
 
+// Where to go after login: only same-site paths, never "//host" or "/\\host" (open redirect).
+function nextPath(): string | null {
+  const next = new URLSearchParams(window.location.search).get("next");
+  return next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : null;
+}
+
+// /admin/learn/ is a route handler, not a page, so it needs a full navigation
+function goNext(router: ReturnType<typeof useRouter>) {
+  const next = nextPath();
+  if (next) window.location.assign(next);
+  else router.push("/admin");
+}
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +43,7 @@ export default function AdminLoginPage() {
         .then((res) => {
           if (res.ok) {
             localStorage.setItem("admin_session", "true");
-            router.push("/admin");
+            goNext(router);
           } else {
             localStorage.removeItem("admin_session");
             localStorage.removeItem("admin_token");
@@ -80,9 +93,7 @@ export default function AdminLoginPage() {
         localStorage.setItem("admin_session", "true");
         localStorage.setItem("admin_token", data.token);
         setLoginStep("success");
-        setTimeout(() => {
-          router.push("/admin");
-        }, 800);
+        setTimeout(() => goNext(router), 800);
       } else {
         setTerminalHistory((prev) => [
           ...prev,

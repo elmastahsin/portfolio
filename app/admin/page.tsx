@@ -629,7 +629,8 @@ export default function AdminDashboardPage() {
 
   const handleLogout = () => {
     localStorage.removeItem("admin_session");
-    router.push("/admin/login");
+    localStorage.removeItem("admin_token");
+    fetch("/api/auth", { method: "DELETE" }).finally(() => router.push("/admin/login"));
   };
 
   if (!isClient) return null;
@@ -687,6 +688,13 @@ export default function AdminDashboardPage() {
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent-primary" />
               )}
             </button>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- route handler, needs a full page load */}
+            <a
+              href="/admin/learn/"
+              className="px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition-all text-text-secondary hover:text-text-primary"
+            >
+              Learning
+            </a>
           </div>
 
           <div className="flex items-center gap-3">
