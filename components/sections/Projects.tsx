@@ -1,103 +1,70 @@
 "use client";
 
 import React from "react";
-import Card from "../ui/Card";
-import Badge from "../ui/Badge";
+import Section from "../ui/Section";
+import Reveal from "../ui/Reveal";
 import { useProfile } from "../ProfileContext";
 import { useLanguage } from "../LanguageContext";
-import { Github, ExternalLink, ArrowRight, TrendingUp } from "lucide-react";
+import { translations } from "@/data/profile";
+import { ChevronRight } from "lucide-react";
+
+function TileLink({ href, external = true, children }: { href: string; external?: boolean; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className="group inline-flex items-center text-[17px] text-accent-primary hover:underline"
+    >
+      {children}
+      <ChevronRight size={17} className="press-motion group-hover:translate-x-0.5" />
+    </a>
+  );
+}
 
 export default function Projects() {
   const { profile } = useProfile();
   const { projects } = profile;
   const { language } = useLanguage();
+  const tSections = translations[language].sections;
 
   return (
-    <section id="projects" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
-      {/* Section Title */}
-      <div className="mb-12 font-mono">
-        <div className="text-xs text-text-tertiary dark:text-accent-primary/80 font-bold mb-1">{"// 03. active_repositories()"}</div>
-        <h2 className="font-display font-bold text-2xl md:text-3xl text-text-primary flex items-center gap-1">
-          <span className="text-accent-secondary">class</span> Projects <span className="text-accent-secondary">extends</span> Repository <span className="text-text-tertiary">{`{`}</span>
-        </h2>
-      </div>
-
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <Section id="projects" title={tSections.projectsTitle} subtitle={tSections.projectsSubtitle}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {projects.map((project, idx) => (
-          <Card key={idx} hoverEffect={true} glassmorphism={true} className="flex flex-col h-full border border-border-color justify-between p-6">
-            <div>
-              {/* Project Title */}
-              <h3 className="font-display font-bold text-xl text-text-primary mb-3">
-                {project.title}
-              </h3>
+          <Reveal key={project.title} delay={(idx % 2) * 80} className="flex">
+            {/* Hover motion sits on the inner tile so it keeps its own fast timing. */}
+            <article className="press-motion flex flex-1 flex-col rounded-[28px] bg-bg-tertiary dark:bg-bg-secondary p-8 md:p-10 hover:-translate-y-1 hover:shadow-card-hover">
+            <p className="text-sm text-text-secondary">{project.techStack.join(" · ")}</p>
 
-              {/* Project Description */}
-              <p className="text-sm text-text-secondary mb-5 leading-relaxed font-normal">
-                {project.description}
-              </p>
+            <h3 className="mt-3 font-display font-semibold text-[28px] leading-[1.12] tracking-[-0.02em] text-text-primary">
+              {project.title}
+            </h3>
 
-              {/* Tech Stack Badges */}
-              <div className="flex flex-wrap gap-1.5 mb-6">
-                {project.techStack.map((tech, index) => (
-                  <Badge key={index} variant="outline" color="slate">
-                    {tech}
-                  </Badge>
-                ))}
-              </div>
+            <p className="mt-4 text-[17px] leading-relaxed text-text-secondary">
+              {project.description}
+            </p>
 
-              {/* Impact / Result Block */}
-              <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-accent-muted border border-accent-primary/20 text-text-secondary mb-6">
-                <TrendingUp size={16} className="mt-0.5 shrink-0 text-accent-primary" />
-                <span className="text-xs font-medium leading-tight">
-                  <span className="font-bold text-accent-primary mr-1">
-                    {language === "tr" ? "Etki / Derece:" : "Impact:"}
-                  </span> {project.keyImpact}
-                </span>
-              </div>
-            </div>
+            <p className="mt-4 text-[17px] leading-relaxed text-text-primary">
+              {project.keyImpact}
+            </p>
 
-            {/* Action Links */}
-            <div className="flex items-center gap-4 pt-3 border-t border-border-color">
-              {project.githubLink && (
-                <a
-                  href={project.githubLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-accent-primary transition-colors duration-200"
-                >
-                  <Github size={14} />
-                  {language === "tr" ? "Kod" : "Code"}
-                </a>
-              )}
+            <div className="mt-auto pt-8 flex flex-wrap items-center gap-x-7 gap-y-2">
               {project.liveLink && (
-                <a
-                  href={project.liveLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-accent-primary transition-colors duration-200"
-                >
-                  <ExternalLink size={14} />
-                  Demo
-                </a>
+                <TileLink href={project.liveLink}>{language === "tr" ? "Canlı gör" : "Visit"}</TileLink>
+              )}
+              {project.githubLink && (
+                <TileLink href={project.githubLink}>{language === "tr" ? "Kodu incele" : "View code"}</TileLink>
               )}
               {project.caseStudyLink && (
-                <a
-                  href={project.caseStudyLink}
-                  className="flex items-center gap-1 text-xs font-semibold text-accent-primary hover:text-accent-secondary transition-colors duration-200 ml-auto"
-                >
-                  {language === "tr" ? "Detaylar" : "Case Study"}
-                  <ArrowRight size={12} />
-                </a>
+                <TileLink href={project.caseStudyLink} external={false}>
+                  {language === "tr" ? "Detaylar" : "Case study"}
+                </TileLink>
               )}
             </div>
-          </Card>
+            </article>
+          </Reveal>
         ))}
       </div>
-      
-      {/* Closing Class Brace */}
-      <div className="font-mono text-text-tertiary text-sm mt-8 select-none">{"}"}</div>
-    </section>
+    </Section>
   );
 }
-

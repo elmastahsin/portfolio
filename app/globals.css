@@ -2,6 +2,8 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Palette follows Apple's product pages: near-white canvas, #F5F5F7 tiles,
+   one accent used only for links and primary actions. */
 :root {
   /* Motion: durations map to Apple's "response", easings to damping ratio.
      press = instant touch-down feedback; base = response 0.3-0.4s. */
@@ -9,132 +11,117 @@
   --dur-fast: 200ms;
   --dur-base: 320ms;
   --dur-slow: 400ms;
+  --dur-reveal: 900ms;
   /* Easings live in @theme below so they also emit `ease-*` utilities. */
 
   /* Translucent material. Alpha + blur are separate so the reduced-transparency
      fallback can solidify the surface without touching layout. */
-  --material-bg: rgba(249, 250, 251, 0.72);
+  --material-bg: rgba(251, 251, 253, 0.8);
   --material-blur: 20px;
   --material-saturate: 180%;
-  --material-edge: rgba(255, 255, 255, 0.55);
+  --material-edge: rgba(0, 0, 0, 0.08);
 
-  --focus-ring-offset: #f9fafb;
+  --focus-ring-offset: #fbfbfd;
 
-  --bg-primary: #f9fafb;
+  --bg-primary: #fbfbfd;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f3f4f6;
-  --text-primary: #111827;
-  --text-secondary: #374151;
-  --text-tertiary: #6b7280;
-  --border-color: #e5e7eb;
-  
-  /* Coder Accent Colors: Cyber Emerald Green & Cyan */
-  --accent-primary: #059669; /* Emerald 600 */
-  --accent-secondary: #0891b2; /* Cyan 600 */
-  --accent-muted: #ecfdf5; /* Emerald 50 */
-  
-  --card-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
-  --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --bg-tertiary: #f5f5f7;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #86868b;
+  --border-color: #d2d2d7;
 
-  /* Badge Indigo */
-  --badge-indigo-bg: #f0f4ff;
-  --badge-indigo-text: #4338ca;
-  --badge-indigo-border: rgba(224, 231, 255, 0.5);
+  /* Default accent (theme "emerald"): a green dark enough for 4.5:1 link text. */
+  --accent-primary: #0a7d4f;
+  --accent-secondary: #0a7d4f;
+  --accent-muted: rgba(10, 125, 79, 0.08);
 
-  /* Badge Violet */
-  --badge-violet-bg: #f5f3ff;
-  --badge-violet-text: #6d28d9;
-  --badge-violet-border: rgba(237, 233, 254, 0.5);
+  --card-shadow: none;
+  --card-hover-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.18);
 
-  /* Badge Green */
-  --badge-green-bg: #ecfdf5;
-  --badge-green-text: #047857;
-  --badge-green-border: rgba(209, 250, 229, 0.5);
+  /* Badges stay neutral; colour is reserved for the accent. */
+  --badge-indigo-bg: #f5f5f7;
+  --badge-indigo-text: #1d1d1f;
+  --badge-indigo-border: transparent;
+  --badge-violet-bg: #f5f5f7;
+  --badge-violet-text: #1d1d1f;
+  --badge-violet-border: transparent;
+  --badge-green-bg: rgba(10, 125, 79, 0.08);
+  --badge-green-text: #0a7d4f;
+  --badge-green-border: transparent;
 }
 
 html.dark {
-  --material-bg: rgba(13, 18, 31, 0.72);
-  --material-edge: rgba(255, 255, 255, 0.08);
-  --focus-ring-offset: #080b11;
+  --material-bg: rgba(22, 22, 23, 0.8);
+  --material-edge: rgba(255, 255, 255, 0.1);
+  --focus-ring-offset: #000000;
 
-  --bg-primary: #080b11; /* Extreme Dark Charcoal Slate */
-  --bg-secondary: #0d121f; /* Editor Dark Slate */
-  --bg-tertiary: #171f30; /* Terminal dark */
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
-  --border-color: #1e293b;
-  
-  /* Neon Coder Accent Colors */
-  --accent-primary: #10b981; /* Emerald 500 */
-  --accent-secondary: #06b6d4; /* Cyan 500 */
-  --accent-muted: rgba(16, 185, 129, 0.08); /* Faint Emerald Glow */
-  
-  --card-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.4);
-  --card-hover-shadow: 0 12px 24px -4px rgba(5, 150, 105, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.3);
+  --bg-primary: #000000;
+  --bg-secondary: #161617;
+  --bg-tertiary: #1d1d1f;
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-tertiary: #86868b;
+  --border-color: #424245;
 
-  /* Badge Indigo */
-  --badge-indigo-bg: rgba(30, 27, 75, 0.4);
-  --badge-indigo-text: #a5b4fc;
-  --badge-indigo-border: rgba(49, 46, 129, 0.3);
+  --accent-primary: #30d158;
+  --accent-secondary: #30d158;
+  --accent-muted: rgba(48, 209, 88, 0.12);
 
-  /* Badge Violet */
-  --badge-violet-bg: rgba(46, 16, 101, 0.4);
-  --badge-violet-text: #c4b5fd;
-  --badge-violet-border: rgba(76, 29, 149, 0.3);
+  --card-hover-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.8);
 
-  /* Badge Green */
-  --badge-green-bg: rgba(6, 78, 59, 0.4);
-  --badge-green-text: #6ee7b7;
-  --badge-green-border: rgba(4, 120, 87, 0.3);
+  --badge-indigo-bg: #1d1d1f;
+  --badge-indigo-text: #f5f5f7;
+  --badge-violet-bg: #1d1d1f;
+  --badge-violet-text: #f5f5f7;
+  --badge-green-bg: rgba(48, 209, 88, 0.12);
+  --badge-green-text: #30d158;
 }
 
-/* Cyan Theme Overrides */
+/* Theme colours chosen in /admin. Apple system colours, darkened in light mode
+   where the system value fails contrast as text. */
 html.theme-cyan {
-  --accent-primary: #0891b2; /* Cyan 600 */
-  --accent-secondary: #4f46e5; /* Indigo 600 */
-  --accent-muted: #ecfeff; /* Cyan 50 */
+  --accent-primary: #0071e3;
+  --accent-secondary: #0071e3;
+  --accent-muted: rgba(0, 113, 227, 0.08);
 }
 html.dark.theme-cyan {
-  --accent-primary: #06b6d4; /* Cyan 500 */
-  --accent-secondary: #6366f1; /* Indigo 500 */
-  --accent-muted: rgba(6, 182, 212, 0.08);
+  --accent-primary: #2997ff;
+  --accent-secondary: #2997ff;
+  --accent-muted: rgba(41, 151, 255, 0.12);
 }
 
-/* Amber/Orange Theme Overrides */
 html.theme-amber {
-  --accent-primary: #d97706; /* Amber 600 */
-  --accent-secondary: #ea580c; /* Orange 600 */
-  --accent-muted: #fffbeb; /* Amber 50 */
+  --accent-primary: #b64400;
+  --accent-secondary: #b64400;
+  --accent-muted: rgba(182, 68, 0, 0.08);
 }
 html.dark.theme-amber {
-  --accent-primary: #f59e0b; /* Amber 500 */
-  --accent-secondary: #f97316; /* Orange 500 */
-  --accent-muted: rgba(245, 158, 11, 0.08);
+  --accent-primary: #ff9f0a;
+  --accent-secondary: #ff9f0a;
+  --accent-muted: rgba(255, 159, 10, 0.12);
 }
 
-/* Fuchsia/Purple Theme Overrides */
 html.theme-fuchsia {
-  --accent-primary: #c026d3; /* Fuchsia 600 */
-  --accent-secondary: #7c3aed; /* Violet 600 */
-  --accent-muted: #fdf4ff; /* Fuchsia 50 */
+  --accent-primary: #8944ab;
+  --accent-secondary: #8944ab;
+  --accent-muted: rgba(137, 68, 171, 0.08);
 }
 html.dark.theme-fuchsia {
-  --accent-primary: #d946ef; /* Fuchsia 500 */
-  --accent-secondary: #8b5cf6; /* Violet 500 */
-  --accent-muted: rgba(217, 70, 239, 0.08);
+  --accent-primary: #bf5af2;
+  --accent-secondary: #bf5af2;
+  --accent-muted: rgba(191, 90, 242, 0.12);
 }
 
-/* Red Theme Overrides */
 html.theme-red {
-  --accent-primary: #dc2626; /* Red 600 */
-  --accent-secondary: #ea580c; /* Orange 600 */
-  --accent-muted: #fef2f2; /* Red 50 */
+  --accent-primary: #d70015;
+  --accent-secondary: #d70015;
+  --accent-muted: rgba(215, 0, 21, 0.08);
 }
 html.dark.theme-red {
-  --accent-primary: #ef4444; /* Red 500 */
-  --accent-secondary: #f97316; /* Orange 500 */
-  --accent-muted: rgba(239, 68, 68, 0.08);
+  --accent-primary: #ff453a;
+  --accent-secondary: #ff453a;
+  --accent-muted: rgba(255, 69, 58, 0.12);
 }
 
 @theme {
@@ -151,9 +138,10 @@ html.dark.theme-red {
   --shadow-card: var(--card-shadow);
   --shadow-card-hover: var(--card-hover-shadow);
   
-  --font-sans: var(--font-inter), sans-serif;
-  --font-mono: var(--font-jetbrains), monospace;
-  --font-display: var(--font-jetbrains), monospace;
+  /* SF Pro on Apple devices (via the system font), Inter everywhere else. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-inter), system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-inter), system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", var(--font-jetbrains), monospace;
 
   /* damping 1.0 - settles without overshoot. Default for everything. */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
@@ -250,8 +238,11 @@ html.theme-changing *::after {
    300ms as colour and shadow is what makes a button feel laggy on touch-down,
    and response is the foundation everything else is built on. */
 .press-motion {
+  /* Tailwind v4 emits translate/scale as their own properties, not transform. */
   transition:
     transform var(--dur-press) var(--ease-settle),
+    scale var(--dur-press) var(--ease-settle),
+    translate var(--dur-base) var(--ease-settle),
     background-color var(--dur-base) var(--ease-settle),
     border-color var(--dur-base) var(--ease-settle),
     box-shadow var(--dur-base) var(--ease-settle),
@@ -277,65 +268,122 @@ html.theme-changing *::after {
   opacity: 1;
 }
 
-/* Cyber Engineering Grid Background */
-.cyber-grid {
-  background-size: 30px 30px;
-  background-image: 
-    linear-gradient(to right, rgba(156, 163, 175, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(156, 163, 175, 0.03) 1px, transparent 1px);
-}
-
-html.dark .cyber-grid {
-  background-image: 
-    linear-gradient(to right, rgba(30, 41, 59, 0.2) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(30, 41, 59, 0.2) 1px, transparent 1px);
-}
-
-/* Custom Scrollbar */
+/* Thin, quiet scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
   background: var(--border-color);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
+/* Apple-style section heading: the title in full ink, the line after it in grey. */
+.headline {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+  line-height: 1.07;
+  letter-spacing: -0.028em;
+  color: var(--text-primary);
+}
+.headline-muted {
+  color: var(--text-secondary);
 }
 
-/* Grid & Utilities */
-.hero-gradient {
-  background: radial-gradient(circle at 50% 50%, var(--accent-muted) 0%, transparent 80%);
+/* Scroll reveal. Hidden only once JS has marked <html>, so content never
+   disappears for visitors without scripts. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity var(--dur-reveal) var(--ease-settle),
+    transform var(--dur-reveal) var(--ease-settle);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js .reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
 }
 
-.text-gradient {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Hero recedes as the page scrolls over it; --hero-progress is 0..1 set from JS. */
+.hero-recede {
+  transform: scale(calc(1 - var(--hero-progress, 0) * 0.08)) translateY(calc(var(--hero-progress, 0) * -24px));
+  opacity: calc(1 - var(--hero-progress, 0) * 1.1);
+  will-change: transform, opacity;
 }
 
-/* Code Editor Lines Accent */
-.code-border {
-  border: 1px solid var(--border-color);
-  position: relative;
+/* Long-form article body (blog posts are stored as HTML). */
+.article {
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
 }
-
-.code-border::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+.article > * + * {
+  margin-top: 1.1em;
+}
+.article h2 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-top: 2em;
+}
+.article h3 {
+  font-family: var(--font-display);
+  font-size: 1.3125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 1.6em;
+}
+.article a {
+  color: var(--accent-primary);
+}
+.article a:hover {
+  text-decoration: underline;
+}
+.article ul,
+.article ol {
+  padding-left: 1.4em;
+}
+.article ul {
+  list-style: disc;
+}
+.article ol {
+  list-style: decimal;
+}
+.article li + li {
+  margin-top: 0.4em;
+}
+.article blockquote {
+  border-left: 3px solid var(--border-color);
+  padding-left: 1em;
+  color: var(--text-secondary);
+}
+.article code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  padding: 0.12em 0.4em;
+}
+.article pre {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  background: var(--bg-tertiary);
+  border-radius: 18px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+}
+.article pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
 }
 
 /* Animations */
@@ -391,6 +439,13 @@ html.dark .cyber-grid {
     animation-duration: var(--dur-fast);
   }
 
+  .js .reveal {
+    transform: none;
+  }
+  .hero-recede {
+    transform: none;
+  }
+
   /* Looping oscillation near 0.2Hz is the exact pattern that triggers
      vestibular symptoms. Both of these are infinite loops. */
   .animate-bounce,
@@ -424,7 +479,7 @@ html.dark .cyber-grid {
     --material-saturate: 100%;
   }
   html.dark {
-    --material-bg: #0d121f;
+    --material-bg: #161617;
   }
   .material {
     backdrop-filter: none;
@@ -440,7 +495,7 @@ html.dark .cyber-grid {
     --border-color: #6b7280;
   }
   html.dark {
-    --material-bg: #05070c;
+    --material-bg: #000000;
     --text-tertiary: #cbd5e1;
     --border-color: #94a3b8;
   }

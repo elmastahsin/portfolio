@@ -1,0 +1,19 @@
+{
+  "_comment": "Konu havuzu. Pipeline her hafta henüz yazılmamış bir konuyu seçebilir. İstediğin gibi ekle/çıkar.",
+  "topics": [
+    "Spring Boot'ta Keycloak + JWT ile kimlik doğrulama: üretimde öğrendiklerim",
+    "Kafka ile mikroservisler arası olay tabanlı iletişim: ne zaman değer, ne zaman fazla",
+    "Elasticsearch'ü işlem arama için kullanmak: indeks tasarımı ve tuzaklar",
+    "Spring Data JPA'da N+1 problemi ve gerçek çözümleri",
+    "Docker ile Spring Boot imajlarını küçültmek: katmanlı jar, distroless, JVM ayarları",
+    "Java 21 virtual thread'ler: Spring MVC uygulamalarına gerçek etkisi",
+    "Temiz mimari Spring projesinde nasıl görünür: paket yapısı ve sınırlar",
+    "LMS gibi kurumsal sistemlerde REST API versiyonlama stratejileri",
+    "AirPods hareket sensörleriyle duruş takibi: Spine'ı yazarken öğrendiklerim",
+    "SwiftUI ile macOS menü çubuğu uygulaması geliştirmek ve Homebrew ile dağıtmak",
+    "ML pipeline'ını üretime almak: MTTR tahmin projesinden notlar",
+    "Backend geliştirici gözüyle LLM'leri uygulamalara entegre etmek",
+    "Ekiplere teknik eğitim vermek: train-the-trainers deneyimi",
+    "Testcontainers ile Spring Boot entegrasyon testleri"
+  ]
+}

@@ -1,0 +1,28 @@
+name: Weekly Blog Draft
+
+on:
+  schedule:
+    # Mondays 06:00 UTC (09:00 Türkiye)
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-blog
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 30
+
+    steps:
+      - name: Generate draft
+        working-directory: /home/tahsin/server/portfolio
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PORTFOLIO_ADMIN_TOKEN: ${{ secrets.PORTFOLIO_ADMIN_TOKEN }}
+          PORTFOLIO_API_URL: http://localhost:3000
+          SITE_URL: https://tahsinelmas.com
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: node scripts/weekly-blog.mjs

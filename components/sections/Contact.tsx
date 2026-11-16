@@ -1,17 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import Card from "../ui/Card";
 import Button from "../ui/Button";
+import Section from "../ui/Section";
+import Reveal from "../ui/Reveal";
 import { useProfile } from "../ProfileContext";
 import { useLanguage } from "../LanguageContext";
 import { translations } from "@/data/profile";
-import { Mail, Linkedin, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function Contact() {
   const { profile } = useProfile();
   const { language } = useLanguage();
   const tButtons = translations[language].buttons;
+  const tSections = translations[language].sections;
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorReason, setErrorReason] = useState<"validation" | "network">("validation");
@@ -50,181 +52,137 @@ export default function Contact() {
     if (status === "error") setStatus("idle");
   };
 
-  return (
-    <section id="contact" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
-      {/* Section Title */}
-      <div className="mb-12 font-mono">
-        <div className="text-xs text-text-tertiary dark:text-accent-primary/80 font-bold mb-1">// 07. establish_communication()</div>
-        <h2 className="font-display font-bold text-2xl md:text-3xl text-text-primary flex items-center gap-1">
-          <span className="text-accent-primary">contact</span><span className="text-text-secondary">.</span>send<span className="text-text-tertiary">()</span> <span className="text-text-tertiary">{`{`}</span>
-        </h2>
-      </div>
+  const fieldClass = "w-full px-4 py-3.5 rounded-xl border border-border-color bg-bg-secondary text-text-primary text-[17px] placeholder:text-text-tertiary focus:outline-none focus:border-accent-primary focus:ring-4 focus:ring-accent-primary/15 disabled:opacity-50 transition-[border-color,box-shadow] duration-200";
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        {/* Left Column: Info & Links */}
-        <div className="lg:col-span-5 space-y-6">
-          <h3 className="font-display font-bold text-2xl text-text-primary mb-3 font-mono">
-            {language === "tr" ? "Birlikte Yeni Projeler Geliştirelim" : "Let's build something together"}
-          </h3>
-          <p className="text-sm md:text-base text-text-secondary leading-relaxed font-normal">
-            {language === "tr" 
-              ? "Yazılım geliştirme rolleri, backend mikroservis mimarileri, eğitim delivery süreçleri veya projeleriniz hakkında görüşmek için mesaj bırakabilirsiniz."
-              : "Whether you want to discuss a software engineering role, backend system architectures, training programs, or just want to connect, feel free to drop me a message."}
+  return (
+    <Section id="contact" title={tSections.contactTitle} subtitle={tSections.contactSubtitle}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-16 gap-y-12 items-start">
+        <Reveal className="lg:col-span-5">
+          <p className="text-[19px] leading-relaxed text-text-secondary">
+            {language === "tr"
+              ? "Backend rolleri, mikroservis mimarileri, ekip eğitimleri ya da sadece tanışmak için yazabilirsiniz."
+              : "Write to me about backend roles, microservice architecture, team training, or just to say hello."}
           </p>
 
-          {/* Contact Details */}
-          <div className="space-y-4 pt-4">
-            <a
-              href={`mailto:${profile.email}`}
-              className="flex items-center gap-3.5 p-4 rounded-xl border border-border-color bg-bg-secondary hover:border-accent-primary/40 dark:hover:border-accent-primary/20 hover:scale-[1.01] transition-all duration-200 shadow-sm"
-            >
-              <div className="p-2.5 rounded-lg bg-accent-muted/40 dark:bg-accent-muted/10 text-accent-primary shrink-0">
-                <Mail size={18} />
-              </div>
-              <div>
-                <span className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-0.5">
-                  {language === "tr" ? "E-Posta Adresi" : "Email Me Direct"}
-                </span>
-                <span className="text-sm font-semibold text-text-primary">
+          <dl className="mt-10 border-b border-border-color">
+            <div className="border-t border-border-color py-5">
+              <dt className="text-sm text-text-secondary">{language === "tr" ? "E-posta" : "Email"}</dt>
+              <dd className="mt-1">
+                <a href={`mailto:${profile.email}`} className="text-[17px] text-accent-primary hover:underline break-all">
                   {profile.email}
-                </span>
-              </div>
-            </a>
-
+                </a>
+              </dd>
+            </div>
             {profile.socials.linkedin && (
-              <a
-                href={profile.socials.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3.5 p-4 rounded-xl border border-border-color bg-bg-secondary hover:border-accent-primary/40 dark:hover:border-accent-primary/20 hover:scale-[1.01] transition-all duration-200 shadow-sm"
-              >
-                <div className="p-2.5 rounded-lg bg-accent-muted/40 dark:bg-accent-muted/10 text-accent-primary shrink-0">
-                  <Linkedin size={18} />
-                </div>
-                <div>
-                  <span className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-0.5">
-                    {language === "tr" ? "LinkedIn Profili" : "Connect on LinkedIn"}
-                  </span>
-                  <span className="text-sm font-semibold text-text-primary break-all block">
-                    {profile.socials.linkedin.replace("https://", "")}
-                  </span>
-                </div>
-              </a>
+              <div className="border-t border-border-color py-5">
+                <dt className="text-sm text-text-secondary">LinkedIn</dt>
+                <dd className="mt-1">
+                  <a
+                    href={profile.socials.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[17px] text-accent-primary hover:underline break-all"
+                  >
+                    {profile.socials.linkedin.replace(/^https?:\/\/(www\.)?/, "")}
+                  </a>
+                </dd>
+              </div>
             )}
-          </div>
-        </div>
+          </dl>
+        </Reveal>
 
-        {/* Right Column: Interactive Form */}
-        <div className="lg:col-span-7">
-          <Card hoverEffect={false} glassmorphism={true} className="border border-border-color p-6 md:p-8">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Form Status Messages */}
-              {status === "success" && (
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 animate-fade-in font-mono text-xs">
-                  <CheckCircle2 size={18} className="shrink-0 mt-0.5" />
-                  <div>
-                    <span className="block text-sm font-bold">
-                      {language === "tr" ? "Mesajınız başarıyla iletildi!" : "Message sent successfully!"}
-                    </span>
-                    <span className="text-xs mt-0.5 block opacity-90">
-                      {language === "tr" ? "İletişime geçtiğiniz için teşekkürler. En kısa sürede dönüş yapacağım." : "Thank you for reaching out. I'll get back to you as soon as possible."}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {status === "error" && (
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-800 dark:text-red-300 animate-fade-in font-mono text-xs">
-                  <AlertCircle size={18} className="shrink-0 mt-0.5" />
-                  <div>
-                    <span className="block text-sm font-bold">
-                      {errorReason === "validation"
-                        ? (language === "tr" ? "Eksik alanlar var!" : "Incomplete fields!")
-                        : (language === "tr" ? "Mesaj gönderilemedi!" : "Message failed to send!")}
-                    </span>
-                    <span className="text-xs mt-0.5 block opacity-90">
-                      {errorReason === "validation"
-                        ? (language === "tr" ? "Lütfen göndermeden önce adınızı, e-postanızı ve mesajınızı doldurun." : "Please fill out your name, email, and message before submitting.")
-                        : (language === "tr" ? "Bir şeyler ters gitti, lütfen tekrar deneyin veya doğrudan e-posta gönderin." : "Something went wrong, please try again or email me directly.")}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono">
+        <Reveal delay={80} className="lg:col-span-7">
+          <form onSubmit={handleSubmit} className="rounded-[28px] bg-bg-tertiary dark:bg-bg-secondary p-6 md:p-10 space-y-4" noValidate>
+            {status === "success" && (
+              <div role="status" className="flex items-start gap-3 rounded-xl bg-accent-muted p-4 text-text-primary animate-fade-in">
+                <CheckCircle2 size={20} className="shrink-0 mt-0.5 text-accent-primary" />
                 <div>
-                  <label htmlFor="name" className="block text-[10px] font-bold text-text-secondary mb-1.5 uppercase tracking-wider">
-                    {language === "tr" ? "Ad Soyad" : "Full Name"}
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formState.name}
-                    onChange={handleChange}
-                    disabled={status === "sending"}
-                    className="w-full px-4 py-2.5 rounded-lg border border-border-color bg-bg-secondary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/40 focus:border-accent-primary disabled:opacity-50 transition-all duration-200"
-                    placeholder={language === "tr" ? "Adınızı girin" : "Enter your name"}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-[10px] font-bold text-text-secondary mb-1.5 uppercase tracking-wider">
-                    {language === "tr" ? "E-Posta" : "Email Address"}
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formState.email}
-                    onChange={handleChange}
-                    disabled={status === "sending"}
-                    className="w-full px-4 py-2.5 rounded-lg border border-border-color bg-bg-secondary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent-primary/40 focus:border-accent-primary disabled:opacity-50 transition-all duration-200"
-                    placeholder={language === "tr" ? "E-posta adresiniz" : "Enter your email"}
-                  />
+                  <p className="font-semibold">{language === "tr" ? "Mesajınız gönderildi." : "Message sent."}</p>
+                  <p className="text-sm text-text-secondary mt-0.5">
+                    {language === "tr" ? "En kısa sürede dönüş yapacağım." : "I'll get back to you soon."}
+                  </p>
                 </div>
               </div>
+            )}
 
+            {status === "error" && (
+              <div role="alert" className="flex items-start gap-3 rounded-xl bg-red-500/10 p-4 text-text-primary animate-fade-in">
+                <AlertCircle size={20} className="shrink-0 mt-0.5 text-red-600 dark:text-red-400" />
+                <div>
+                  <p className="font-semibold">
+                    {errorReason === "validation"
+                      ? (language === "tr" ? "Tüm alanları doldurun." : "Fill in every field.")
+                      : (language === "tr" ? "Mesaj gönderilemedi." : "Message not sent.")}
+                  </p>
+                  <p className="text-sm text-text-secondary mt-0.5">
+                    {errorReason === "validation"
+                      ? (language === "tr" ? "Ad, e-posta ve mesaj gerekli." : "Name, email and message are required.")
+                      : (language === "tr" ? "Tekrar deneyin ya da doğrudan e-posta gönderin." : "Try again, or email me directly.")}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="message" className="block text-[10px] font-bold text-text-secondary mb-1.5 uppercase tracking-wider font-mono">
-                  {language === "tr" ? "Mesajınız" : "Your Message"}
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={5}
-                  value={formState.message}
+                <label htmlFor="name" className="sr-only">{language === "tr" ? "Ad soyad" : "Name"}</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  autoComplete="name"
+                  value={formState.name}
                   onChange={handleChange}
                   disabled={status === "sending"}
-                  className="w-full px-4 py-2.5 rounded-lg border border-border-color bg-bg-secondary text-text-primary text-sm font-mono focus:outline-none focus:ring-2 focus:ring-accent-primary/40 focus:border-accent-primary disabled:opacity-50 resize-none transition-all duration-200"
-                  placeholder={language === "tr" ? "Mesajınızı veya proje detaylarını buraya yazabilirsiniz..." : "Enter details of your project or role request..."}
+                  className={fieldClass}
+                  placeholder={language === "tr" ? "Ad soyad" : "Name"}
                 />
               </div>
+              <div>
+                <label htmlFor="email" className="sr-only">{language === "tr" ? "E-posta" : "Email"}</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  autoComplete="email"
+                  value={formState.email}
+                  onChange={handleChange}
+                  disabled={status === "sending"}
+                  className={fieldClass}
+                  placeholder={language === "tr" ? "E-posta" : "Email"}
+                />
+              </div>
+            </div>
 
-              <Button
-                type="submit"
+            <div>
+              <label htmlFor="message" className="sr-only">{language === "tr" ? "Mesaj" : "Message"}</label>
+              <textarea
+                id="message"
+                name="message"
+                rows={6}
+                value={formState.message}
+                onChange={handleChange}
                 disabled={status === "sending"}
-                className="w-full flex items-center justify-center gap-2 font-mono"
-              >
+                className={`${fieldClass} resize-none`}
+                placeholder={language === "tr" ? "Mesajınız" : "Message"}
+              />
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <Button type="submit" size="lg" disabled={status === "sending"} className="gap-2 w-full sm:w-auto">
                 {status === "sending" ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
                     {tButtons.sending}
                   </>
                 ) : (
-                  <>
-                    <Send size={15} />
-                    {tButtons.sendMessage}
-                  </>
+                  tButtons.sendMessage
                 )}
               </Button>
-            </form>
-          </Card>
-        </div>
+            </div>
+          </form>
+        </Reveal>
       </div>
-      
-      {/* Closing Gutter */}
-      <div className="font-mono text-text-tertiary text-sm mt-8 select-none">{"}"}</div>
-    </section>
+    </Section>
   );
 }
-

@@ -82,29 +82,29 @@ export const translations = {
       contact: "Contact",
     },
     sections: {
-      aboutTitle: "About Me",
-      aboutSubtitle: "Passionate about software architecture, clean code, and continuous learning.",
-      skillsTitle: "Technical Skills",
-      skillsSubtitle: "Core technologies and tools I leverage to build scalable enterprise solutions.",
-      projectsTitle: "Featured Projects",
-      projectsSubtitle: "Selected projects demonstrating backend microservices, mobile, and machine learning capabilities.",
-      experienceTitle: "Work Experience",
-      experienceSubtitle: "My professional career trajectory in backend software development and computer engineering.",
+      aboutTitle: "About",
+      aboutSubtitle: "How I work and what I care about.",
+      skillsTitle: "Tech specs",
+      skillsSubtitle: "The tools I reach for every day.",
+      projectsTitle: "Projects",
+      projectsSubtitle: "Things I've designed, built and shipped.",
+      experienceTitle: "Experience",
+      experienceSubtitle: "Where I've worked.",
       educationTitle: "Education",
-      educationSubtitle: "Academic engineering foundation and computer science degree.",
-      certificationsTitle: "Certifications & Awards",
-      certificationsSubtitle: "Recognitions and specialized engineering credentials.",
-      contactTitle: "Get In Touch",
-      contactSubtitle: "Feel free to reach out for collaborations, inquiries, or technical discussion.",
-      blogTitle: "Latest Articles",
-      blogSubtitle: "Insights on software engineering, backend architecture, and distributed systems.",
+      educationSubtitle: "Where I studied.",
+      certificationsTitle: "Awards",
+      certificationsSubtitle: "Recognition along the way.",
+      contactTitle: "Contact",
+      contactSubtitle: "Tell me about your project or role.",
+      blogTitle: "Writing",
+      blogSubtitle: "Notes on backend engineering.",
     },
     buttons: {
       getInTouch: "Get In Touch",
       downloadCv: "Download CV",
       viewProject: "View Project",
       viewCode: "View Code",
-      sendMessage: "Send Message",
+      sendMessage: "Send message",
       sending: "Sending...",
       success: "Message Sent!",
     },
@@ -129,28 +129,28 @@ export const translations = {
     },
     sections: {
       aboutTitle: "Hakkımda",
-      aboutSubtitle: "Yazılım mimarisi, temiz kod ve sürekli öğrenme tutkusu.",
-      skillsTitle: "Teknik Yetkinlikler",
-      skillsSubtitle: "Ölçeklenebilir kurumsal çözümler geliştirmek için kullandığım teknolojiler ve araçlar.",
-      projectsTitle: "Öne Çıkan Projeler",
-      projectsSubtitle: "Backend mikroservisler, mobil ve makine öğrenmesi yetkinliklerimi yansıtan projeler.",
-      experienceTitle: "İş Deneyimi",
-      experienceSubtitle: "Yazılım geliştirme ve bilgisayar mühendisliği süreçlerindeki profesyonel kariyer yolculuğum.",
+      aboutSubtitle: "Nasıl çalıştığım ve neyi önemsediğim.",
+      skillsTitle: "Teknik özellikler",
+      skillsSubtitle: "Her gün kullandığım araçlar.",
+      projectsTitle: "Projeler",
+      projectsSubtitle: "Tasarlayıp geliştirdiğim ve yayına aldığım işler.",
+      experienceTitle: "Deneyim",
+      experienceSubtitle: "Çalıştığım yerler.",
       educationTitle: "Eğitim",
-      educationSubtitle: "Akademik bilgisayar mühendisliği altyapım ve lisans derecem.",
-      certificationsTitle: "Sertifikalar ve Ödüller",
-      certificationsSubtitle: "Kazandığım ödüller ve uzmanlık sertifikalarım.",
-      contactTitle: "İletişime Geçin",
-      contactSubtitle: "İş birliği, projeler veya teknik konular için benimle iletişime geçebilirsiniz.",
-      blogTitle: "Son Yazılar",
-      blogSubtitle: "Yazılım mühendisliği, backend mimarileri ve sistem geliştirme üzerine düşünceler.",
+      educationSubtitle: "Okuduğum yer.",
+      certificationsTitle: "Ödüller",
+      certificationsSubtitle: "Yol boyunca gelen takdirler.",
+      contactTitle: "İletişim",
+      contactSubtitle: "Projenizden veya pozisyondan bahsedin.",
+      blogTitle: "Yazılar",
+      blogSubtitle: "Backend mühendisliği üzerine notlar.",
     },
     buttons: {
       getInTouch: "İletişime Geç",
       downloadCv: "CV İndir",
       viewProject: "Projeyi İncele",
       viewCode: "Kodu İncele",
-      sendMessage: "Mesaj Gönder",
+      sendMessage: "Mesajı gönder",
       sending: "Gönderiliyor...",
       success: "Mesaj Gönderildi!",
     },
@@ -186,9 +186,10 @@ export const profileDataEn: ProfileData = {
     interests: ["Java Backend Architecture", "Spring Framework & Microservices", "Machine Learning & LLM Pipelines", "Cloud & DevOps (Docker, AWS, Kafka)", "Software Engineering & Clean Code"]
   },
   skills: [
-    { title: "Programming Languages", items: ["Java", "Python", "C", "C++", "SQL", "TypeScript"] },
+    { title: "Programming Languages", items: ["Java", "Python", "Swift", "C", "C++", "SQL", "TypeScript"] },
     { title: "Backend & Tech", items: ["Spring Framework", "FastAPI", "Hibernate", "Microservices", "Kafka", "Docker", "AWS"] },
-    { title: "Databases & Tools", items: ["PostgreSQL", "MySQL", "Elasticsearch", "Postman", "Swagger", "Git"] }
+    { title: "Databases & Tools", items: ["PostgreSQL", "MySQL", "Elasticsearch", "Postman", "Swagger", "Git"] },
+    { title: "Mobile & Desktop", items: ["SwiftUI", "macOS Menu Bar Apps", "React Native"] }
   ],
   projects: [
     {
@@ -198,6 +199,20 @@ export const profileDataEn: ProfileData = {
       keyImpact: "Awarded 5th place out of 35 engineering projects at METU-CENG Demo Day 2025.",
       githubLink: "https://github.com/elmastahsin",
       liveLink: "https://senior.ceng.metu.edu.tr/2025/GURME/"
+    },
+    {
+      title: "Spine – AirPods Posture Coach for macOS",
+      description: "An open-source macOS menu bar app that tracks head tilt through the motion sensors in AirPods against a calibrated baseline and gives a short spoken nudge after sustained slouching. Fully on-device: no camera, no network calls, no third-party dependencies.",
+      techStack: ["Swift", "SwiftUI", "CoreMotion", "XCTest", "Homebrew"],
+      keyImpact: "Shipped as an MIT-licensed app installable via a personal Homebrew tap, with unit-tested posture-evaluation and calibration logic.",
+      githubLink: "https://github.com/elmastahsin/spine"
+    },
+    {
+      title: "FocusBlocker – macOS Website & App Blocker",
+      description: "A macOS menu bar app that blocks distracting websites and apps for a set time. A SwiftUI front end talks to a privileged daemon that enforces blocks via the hosts file, DNS cache flushes and app termination, with shared logic in a separate Swift package.",
+      techStack: ["Swift", "SwiftUI", "Swift Package Manager", "launchd Daemon", "Homebrew"],
+      keyImpact: "Designed a split app/daemon architecture with code-signing checks so blocks can't be bypassed by simply quitting the app.",
+      githubLink: "https://github.com/elmastahsin/focusblocker"
     },
     {
       title: "UNO-like Multiplayer Game Engine",
@@ -304,9 +319,10 @@ export const profileDataTr: ProfileData = {
     interests: ["Java Backend Mimarisi", "Spring Framework & Mikroservisler", "Makine Öğrenmesi & LLM Hatları", "Bulut & DevOps (Docker, AWS, Kafka)", "Yazılım Mühendisliği & Temiz Kod"]
   },
   skills: [
-    { title: "Programlama Dilleri", items: ["Java", "Python", "C", "C++", "SQL", "TypeScript"] },
+    { title: "Programlama Dilleri", items: ["Java", "Python", "Swift", "C", "C++", "SQL", "TypeScript"] },
     { title: "Backend & Teknolojiler", items: ["Spring Framework", "FastAPI", "Hibernate", "Mikroservisler", "Kafka", "Docker", "AWS"] },
-    { title: "Veritabanları & Araçlar", items: ["PostgreSQL", "MySQL", "Elasticsearch", "Postman", "Swagger", "Git"] }
+    { title: "Veritabanları & Araçlar", items: ["PostgreSQL", "MySQL", "Elasticsearch", "Postman", "Swagger", "Git"] },
+    { title: "Mobil & Masaüstü", items: ["SwiftUI", "macOS Menu Bar Apps", "React Native"] }
   ],
   projects: [
     {
@@ -316,6 +332,20 @@ export const profileDataTr: ProfileData = {
       keyImpact: "METU-CENG Demo Day 2025'te 35 mühendislik projesi arasında 5.lik ödülü kazandı.",
       githubLink: "https://github.com/elmastahsin",
       liveLink: "https://senior.ceng.metu.edu.tr/2025/GURME/"
+    },
+    {
+      title: "Spine – macOS için AirPods Duruş Koçu",
+      description: "AirPods'taki hareket sensörleriyle baş eğimini kalibre edilmiş referansa göre takip eden ve uzun süre kambur durulduğunda kısa bir sesli uyarı veren açık kaynak macOS menü çubuğu uygulaması. Tamamen cihaz üzerinde çalışır: kamera, ağ çağrısı veya üçüncü parti bağımlılık yok.",
+      techStack: ["Swift", "SwiftUI", "CoreMotion", "XCTest", "Homebrew"],
+      keyImpact: "MIT lisansıyla, kişisel Homebrew tap üzerinden kurulabilir şekilde yayınlandı; duruş değerlendirme ve kalibrasyon mantığı birim testleriyle kapsandı.",
+      githubLink: "https://github.com/elmastahsin/spine"
+    },
+    {
+      title: "FocusBlocker – macOS Site ve Uygulama Engelleyici",
+      description: "Dikkat dağıtan web sitelerini ve uygulamaları belirli bir süre engelleyen macOS menü çubuğu uygulaması. SwiftUI arayüzü; hosts dosyası, DNS önbellek temizliği ve uygulama sonlandırma ile engeli uygulayan ayrıcalıklı bir daemon ile haberleşir, ortak mantık ayrı bir Swift paketinde tutulur.",
+      techStack: ["Swift", "SwiftUI", "Swift Package Manager", "launchd Daemon", "Homebrew"],
+      keyImpact: "Engellerin uygulamayı kapatarak aşılamaması için kod imzası doğrulamalı uygulama/daemon mimarisi tasarlandı.",
+      githubLink: "https://github.com/elmastahsin/focusblocker"
     },
     {
       title: "UNO Benzeri Çok Oyunculu Oyun Motoru",

@@ -86,6 +86,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialProfile = await getProfileData();
+  // Privacy-friendly analytics (self-hosted Umami). Off unless both are configured.
+  const analyticsSrc = process.env.UMAMI_SCRIPT_URL;
+  const analyticsId = process.env.UMAMI_WEBSITE_ID;
 
   return (
     <html
@@ -99,11 +102,14 @@ export default async function RootLayout({
             made light-theme users see a dark flash on every load. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("theme");if(!t){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.classList.toggle("dark",t==="dark")}catch(e){}})()`,
+            __html: `(function(){document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(!t){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.classList.toggle("dark",t==="dark")}catch(e){}})()`,
           }}
         />
+        {analyticsSrc && analyticsId && (
+          <script defer src={analyticsSrc} data-website-id={analyticsId} />
+        )}
       </head>
-      <body className="min-h-full flex flex-col bg-bg-primary text-text-primary antialiased cyber-grid">
+      <body className="min-h-full flex flex-col bg-bg-primary text-text-primary antialiased">
         <LanguageProvider>
           <ThemeProvider>
             <ProfileProvider initialProfile={initialProfile}>

@@ -1,7 +1,7 @@
 import { prefersReducedMotion } from "./spring";
 
 /** Height of the fixed navbar; anchors land below it rather than under it. */
-const NAV_OFFSET = 80;
+const NAV_OFFSET = 48;
 
 /**
  * Scroll to a section. Smooth scrolling is a large moving field of view, so it

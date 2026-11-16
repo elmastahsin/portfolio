@@ -36,7 +36,7 @@ export default function Badge({
     }
   };
 
-  const baseStyles = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors duration-150";
+  const baseStyles = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-normal transition-colors duration-150";
   const selectedStyle = colorMaps[color][variant];
 
   return (

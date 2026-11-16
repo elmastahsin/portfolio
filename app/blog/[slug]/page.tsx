@@ -2,15 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { BlogPost, initialBlogs } from "@/data/blogs";
-import Badge from "@/components/ui/Badge";
-import ThemeToggle from "@/components/Navbar"; // Navbar handles themes globally
-import { Calendar, Clock, User, ArrowLeft, ArrowUp } from "lucide-react";
+import { BlogPost, initialBlogs, localizePost } from "@/data/blogs";
+import { useLanguage } from "@/components/LanguageContext";
+import { ChevronLeft, ArrowUp } from "lucide-react";
 
 export default function BlogDetailPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
+  const { language } = useLanguage();
 
   const [post, setPost] = useState<BlogPost | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -74,106 +74,71 @@ export default function BlogDetailPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-bg-primary text-text-primary px-6">
-        <div className="font-mono text-center space-y-4">
-          <p className="text-sm text-accent-primary">// ERROR: 404_POST_NOT_FOUND</p>
-          <h1 className="text-2xl font-bold font-display">Article Not Found</h1>
-          <p className="text-xs text-text-tertiary">The file or path requested could not be resolved.</p>
-          <button
-            onClick={() => router.push("/")}
-            className="inline-flex items-center gap-2 text-xs font-bold text-accent-primary hover:opacity-80 cursor-pointer pt-4"
-          >
-            <ArrowLeft size={14} />
-            Back to Terminal Home
-          </button>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-bg-primary text-text-primary px-6 text-center">
+        <h1 className="headline">{language === "tr" ? "Yazı bulunamadı." : "Article not found."}</h1>
+        <p className="mt-4 text-[17px] text-text-secondary">
+          {language === "tr" ? "Bağlantı eski olabilir ya da yazı kaldırılmış olabilir." : "The link may be outdated, or the post was removed."}
+        </p>
+        <button
+          onClick={() => router.push("/#blog")}
+          className="mt-8 inline-flex items-center text-[17px] text-accent-primary hover:underline cursor-pointer"
+        >
+          <ChevronLeft size={18} />
+          {language === "tr" ? "Tüm yazılar" : "All articles"}
+        </button>
       </div>
     );
   }
 
+  const view = localizePost(post, language);
+
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary pb-20">
-      {/* Dynamic Reading Progress Bar */}
+    <div className="min-h-screen bg-bg-primary text-text-primary pb-24">
+      {/* Reading progress: a hairline across the top, not a banner */}
       <div
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-accent-primary to-accent-secondary z-50 transition-all duration-75"
+        className="fixed top-0 left-0 h-0.5 bg-accent-primary z-[60]"
         style={{ width: `${scrollProgress}%` }}
+        aria-hidden
       />
 
-      {/* Floating Header */}
-      <header className="sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-md border-b border-border-color py-4">
-        <div className="max-w-4xl mx-auto px-6 flex items-center justify-between">
+      <header className="material sticky top-0 z-40 px-6">
+        <div className="max-w-[1080px] mx-auto h-12 flex items-center justify-between">
           <button
-            onClick={() => router.push("/")}
-            className="inline-flex items-center gap-2 text-xs font-mono font-bold text-text-secondary hover:text-accent-primary cursor-pointer active:scale-95 transition-all"
+            onClick={() => router.push("/#blog")}
+            className="press-motion inline-flex items-center text-sm text-accent-primary cursor-pointer active:scale-95"
           >
-            <ArrowLeft size={14} />
-            &lt;Back to Home /&gt;
+            <ChevronLeft size={16} />
+            {language === "tr" ? "Yazılar" : "Writing"}
           </button>
-          
-          <div className="font-mono text-[10px] text-text-tertiary hidden sm:block">
-            // Reading: {post.slug}.md
-          </div>
+          <span className="text-[15px] font-semibold tracking-tight text-text-primary">{post.author}</span>
         </div>
       </header>
 
-      {/* Article Wrapper */}
-      <article className="max-w-3xl mx-auto px-6 pt-12 md:pt-16">
-        {/* Category & Tags */}
-        <div className="flex items-center gap-3 mb-6">
-          <Badge variant="subtle" color="indigo">
-            {post.category}
-          </Badge>
-          {post.tags?.map((tag, idx) => (
-            <span key={idx} className="font-mono text-xs text-text-tertiary">
-              #{tag}
-            </span>
-          ))}
-        </div>
+      <article className="max-w-[692px] mx-auto px-6 pt-16 md:pt-24 animate-fade-in">
+        <p className="text-sm text-text-secondary">
+          {post.category} · {post.date} · {post.readTime}
+        </p>
 
-        {/* Title */}
-        <h1 className="font-display font-bold text-3xl md:text-5xl text-text-primary mb-6 leading-tight">
-          {post.title}
+        <h1 className="mt-4 font-display font-semibold text-[clamp(2.25rem,1.6rem+2.8vw,3.5rem)] leading-[1.07] tracking-[-0.028em] text-text-primary">
+          {view.title}
         </h1>
 
-        {/* Author & Date metadata */}
-        <div className="flex flex-wrap items-center gap-4 text-xs text-text-tertiary pb-8 border-b border-border-color mb-10">
-          <span className="flex items-center gap-1.5 font-medium text-text-secondary">
-            <User size={13} className="text-accent-primary" />
-            {post.author}
-          </span>
-          <span>•</span>
-          <span className="flex items-center gap-1.5">
-            <Calendar size={13} />
-            {post.date}
-          </span>
-          <span>•</span>
-          <span className="flex items-center gap-1.5">
-            <Clock size={13} />
-            {post.readTime}
-          </span>
-        </div>
+        <p className="mt-6 text-[21px] leading-snug text-text-secondary">{view.summary}</p>
 
-        {/* Body Content */}
-        <div
-          className="prose prose-slate dark:prose-invert max-w-none 
-            text-text-secondary leading-relaxed space-y-6 text-base font-normal
-            prose-headings:font-display prose-headings:font-bold prose-headings:text-text-primary
-            prose-h2:text-2xl prose-h2:pt-6 prose-h2:pb-2
-            prose-h3:text-xl prose-h3:pt-4
-            prose-code:font-mono prose-code:text-sm prose-code:bg-bg-tertiary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-border-color/30 prose-code:text-accent-primary
-            prose-pre:bg-bg-tertiary prose-pre:border prose-pre:border-border-color prose-pre:p-4 prose-pre:rounded-xl prose-pre:font-mono prose-pre:text-xs prose-pre:block prose-pre:overflow-x-auto
-            prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6
-          "
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        <div className="article mt-12 pt-10 border-t border-border-color" dangerouslySetInnerHTML={{ __html: view.content }} />
+
+        {post.tags && post.tags.length > 0 && (
+          <p className="mt-16 pt-6 border-t border-border-color text-sm text-text-secondary">
+            {post.tags.map((tag) => `#${tag}`).join("  ")}
+          </p>
+        )}
       </article>
 
-      {/* Floating Scroll to Top */}
       {scrollProgress > 20 && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 p-3 rounded-full bg-accent-primary hover:bg-accent-secondary text-white shadow-lg shadow-accent-primary/20 cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 z-40"
-          aria-label="Scroll to Top"
+          className="press-motion material fixed bottom-6 right-6 p-3 rounded-full text-text-primary shadow-card-hover cursor-pointer active:scale-90 z-40"
+          aria-label={language === "tr" ? "Başa dön" : "Back to top"}
         >
           <ArrowUp size={16} />
         </button>

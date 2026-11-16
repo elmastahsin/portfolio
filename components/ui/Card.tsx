@@ -2,13 +2,14 @@ import React from "react";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   hoverEffect?: boolean;
+  /** Kept for API compatibility; tiles are solid surfaces now. */
   glassmorphism?: boolean;
   children: React.ReactNode;
 }
 
 export default function Card({
   hoverEffect = true,
-  glassmorphism = true,
+  glassmorphism: _glassmorphism, // eslint-disable-line @typescript-eslint/no-unused-vars
   className = "",
   children,
   ...props
@@ -16,9 +17,8 @@ export default function Card({
   return (
     <div
       className={`
-        press-motion rounded-xl border border-border-color p-6 shadow-card
-        ${glassmorphism ? "material" : "bg-bg-secondary"}
-        ${hoverEffect ? "hover:scale-[1.01] hover:shadow-card-hover hover:border-accent-primary/40 dark:hover:border-accent-primary/30" : ""}
+        press-motion rounded-[28px] bg-bg-secondary p-6
+        ${hoverEffect ? "hover:-translate-y-0.5 hover:shadow-card-hover" : ""}
         ${className}
       `}
       {...props}

@@ -57,6 +57,12 @@ function getLocalDatabase() {
         created_at TEXT NOT NULL,
         read INTEGER NOT NULL DEFAULT 0
       );
+
+      CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
     `);
 
     database
@@ -98,6 +104,33 @@ export async function getBlogs(): Promise<BlogPost[]> {
     .prepare("SELECT data FROM blogs ORDER BY created_at DESC")
     .all() as SqliteRow[];
   return rows.map((row) => JSON.parse(row.data) as BlogPost);
+}
+
+export async function getBlog(id: string): Promise<BlogPost | null> {
+  const row = getLocalDatabase()
+    .prepare("SELECT data FROM blogs WHERE id = ?")
+    .get(id) as SqliteRow | undefined;
+  return row ? (JSON.parse(row.data) as BlogPost) : null;
+}
+
+export async function getSetting<T>(key: string): Promise<T | null> {
+  const row = getLocalDatabase()
+    .prepare("SELECT value FROM settings WHERE key = ?")
+    .get(key) as { value: string } | undefined;
+  return row ? (JSON.parse(row.value) as T) : null;
+}
+
+export async function setSetting(key: string, value: unknown): Promise<void> {
+  getLocalDatabase()
+    .prepare(`
+      INSERT INTO settings (key, value, updated_at) VALUES (?, ?, ?)
+      ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at
+    `)
+    .run(key, JSON.stringify(value), new Date().toISOString());
+}
+
+export async function deleteSetting(key: string): Promise<void> {
+  getLocalDatabase().prepare("DELETE FROM settings WHERE key = ?").run(key);
 }
 
 export async function saveBlog(blog: BlogPost): Promise<BlogPost> {

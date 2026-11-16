@@ -10,7 +10,8 @@ import { useProfile } from "@/components/ProfileContext";
 import { 
   FileText, Plus, Trash2, Edit2, LogOut, Save, ArrowLeft, 
   Settings, CheckCircle2, ChevronRight, BookOpen, AlertCircle,
-  User, Link as LinkIcon, Briefcase, GraduationCap, Award, FolderGit2, Languages, Image as ImageIcon
+  User, Link as LinkIcon, Briefcase, GraduationCap, Award, FolderGit2, Languages, Image as ImageIcon,
+  Send, Linkedin
 } from "lucide-react";
 import { ProfileData } from "@/data/profile";
 
@@ -40,6 +41,14 @@ export default function AdminDashboardPage() {
   const [category, setCategory] = useState("Backend");
   const [readTime, setReadTime] = useState("5 min read");
   const [tagsInput, setTagsInput] = useState("");
+  const [linkedinPost, setLinkedinPost] = useState("");
+  const [trTitle, setTrTitle] = useState("");
+  const [trSummary, setTrSummary] = useState("");
+  const [trContent, setTrContent] = useState("");
+
+  // LinkedIn connection
+  const [linkedin, setLinkedin] = useState<{ configured: boolean; connected: boolean; name: string | null; expiresAt: string | null } | null>(null);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
 
   // Profile Form fields
   const [profileName, setProfileName] = useState("");
@@ -136,6 +145,7 @@ export default function AdminDashboardPage() {
     // Load initial list
     loadBlogs();
     loadMessages();
+    loadLinkedInStatus();
 
     // Map profile values to form states
     setProfileName(profile.name || "");
@@ -215,9 +225,24 @@ export default function AdminDashboardPage() {
     })));
   }, [router, profile]);
 
+  // Result of the LinkedIn OAuth redirect (/api/linkedin/callback -> /admin?linkedin=...)
+  useEffect(() => {
+    const result = new URLSearchParams(window.location.search).get("linkedin");
+    if (!result) return;
+    if (result === "connected") {
+      triggerNotification("Success: LinkedIn connected!");
+    } else {
+      triggerNotification(`LinkedIn connection failed: ${result}`, "error");
+    }
+    window.history.replaceState(null, "", "/admin");
+  }, []);
+
   const loadBlogs = async () => {
     try {
-      const res = await fetch("/api/blogs");
+      // Authorized requests also return drafts waiting for approval
+      const res = await fetch("/api/blogs", {
+        headers: { "Authorization": localStorage.getItem("admin_token") || "" }
+      });
       if (!res.ok) throw new Error("Failed to fetch blogs");
       const data: BlogPost[] = await res.json();
       setBlogs(data);
@@ -235,6 +260,56 @@ export default function AdminDashboardPage() {
         }
       }
       setBlogs([...parsedCustom, ...initialBlogs]);
+    }
+  };
+
+  const loadLinkedInStatus = async () => {
+    try {
+      const res = await fetch("/api/linkedin", {
+        headers: { "Authorization": localStorage.getItem("admin_token") || "" }
+      });
+      if (res.ok) setLinkedin(await res.json());
+    } catch (e) {
+      console.error("Could not load LinkedIn status.", e);
+    }
+  };
+
+  const handleConnectLinkedIn = async () => {
+    try {
+      const res = await fetch("/api/linkedin", {
+        method: "POST",
+        headers: { "Authorization": localStorage.getItem("admin_token") || "" }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      window.location.href = data.url;
+    } catch (e: any) {
+      triggerNotification(`LinkedIn: ${e.message}`, "error");
+    }
+  };
+
+  // Publishes a draft on the site and shares it on LinkedIn; for published posts it only shares
+  const handlePublishPost = async (post: BlogPost) => {
+    const action = post.status === "draft" ? "Publish this draft on the site and share it on LinkedIn?" : "Share this post on LinkedIn?";
+    if (!confirm(action)) return;
+    setPublishingId(post.id);
+    try {
+      const res = await fetch(`/api/blogs/publish?id=${encodeURIComponent(post.id)}`, {
+        method: "POST",
+        headers: { "Authorization": localStorage.getItem("admin_token") || "" }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      if (data.linkedin === "failed") {
+        triggerNotification(`Published on site, LinkedIn failed: ${data.linkedinError}`, "error");
+      } else {
+        triggerNotification(data.linkedin === "shared" ? "Success: Published and shared on LinkedIn!" : "Success: Post published!");
+      }
+      loadBlogs();
+    } catch (e: any) {
+      triggerNotification(`ERROR: ${e.message}`, "error");
+    } finally {
+      setPublishingId(null);
     }
   };
 
@@ -311,6 +386,10 @@ export default function AdminDashboardPage() {
     setCategory("Backend");
     setReadTime("5 min read");
     setTagsInput("");
+    setLinkedinPost("");
+    setTrTitle("");
+    setTrSummary("");
+    setTrContent("");
     setEditingId(null);
     setEditorMode("create");
   };
@@ -355,7 +434,9 @@ export default function AdminDashboardPage() {
       readTime,
       date: isCreate ? formattedDate : (blogs.find(b => b.id === postId)?.date || formattedDate),
       author: profileName || "Developer",
-      tags
+      tags,
+      linkedinPost,
+      tr: trTitle && trContent ? { title: trTitle, summary: trSummary, content: trContent } : undefined
     };
 
     try {
@@ -417,6 +498,10 @@ export default function AdminDashboardPage() {
     setCategory(post.category);
     setReadTime(post.readTime);
     setTagsInput(post.tags?.join(", ") || "");
+    setLinkedinPost(post.linkedinPost || "");
+    setTrTitle(post.tr?.title || "");
+    setTrSummary(post.tr?.summary || "");
+    setTrContent(post.tr?.content || "");
   };
 
   // Delete Blog Post
@@ -643,6 +728,28 @@ export default function AdminDashboardPage() {
                 </span>
               </div>
 
+              <div className="p-4 rounded-xl border border-border-color bg-bg-secondary flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs">
+                  <Linkedin size={15} className="text-accent-primary shrink-0" />
+                  {!linkedin ? (
+                    <span className="text-text-tertiary font-mono">LinkedIn status loading...</span>
+                  ) : !linkedin.configured ? (
+                    <span className="text-text-tertiary">LinkedIn app not configured (LINKEDIN_CLIENT_ID / SECRET)</span>
+                  ) : linkedin.connected ? (
+                    <span className="text-text-secondary">
+                      Connected{linkedin.name ? ` as ${linkedin.name}` : ""} · expires {new Date(linkedin.expiresAt!).toLocaleDateString()}
+                    </span>
+                  ) : (
+                    <span className="text-text-secondary">LinkedIn not connected</span>
+                  )}
+                </div>
+                {linkedin?.configured && (
+                  <Button variant="outline" size="sm" onClick={handleConnectLinkedIn} className="font-mono cursor-pointer shrink-0">
+                    {linkedin.connected ? "Reconnect" : "Connect"}
+                  </Button>
+                )}
+              </div>
+
               <div className="space-y-3 overflow-y-auto max-h-[70vh] pr-2">
                 {blogs.map((post) => {
                   const isStatic = post.id.startsWith("post-");
@@ -656,8 +763,11 @@ export default function AdminDashboardPage() {
                       <div className="space-y-1 max-w-[70%]">
                         <div className="flex items-center gap-2">
                           <Badge variant="subtle" color={isStatic ? "slate" : "indigo"} className="scale-[0.85] origin-left">
-                            {isStatic ? "Mock" : "User"}
+                            {isStatic ? "Mock" : post.status === "draft" ? "Draft" : "Live"}
                           </Badge>
+                          {post.linkedinPostUrn && (
+                            <span className="text-[10px] text-accent-primary font-mono" title={`Shared ${post.linkedinSharedAt || ""}`}>in✓</span>
+                          )}
                           <span className="text-[10px] text-text-tertiary font-mono">{post.date}</span>
                         </div>
                         <h3 className="font-display font-bold text-sm text-text-primary truncate">
@@ -671,6 +781,16 @@ export default function AdminDashboardPage() {
                       <div className="flex items-center gap-2">
                         {!isStatic ? (
                           <>
+                            {!post.linkedinPostUrn && (
+                              <button
+                                onClick={() => handlePublishPost(post)}
+                                disabled={publishingId === post.id}
+                                className="p-2 rounded bg-bg-tertiary text-text-secondary hover:text-accent-primary transition-all cursor-pointer disabled:opacity-50"
+                                title={post.status === "draft" ? "Publish & Share on LinkedIn" : "Share on LinkedIn"}
+                              >
+                                <Send size={13} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleStartEdit(post)}
                               className="p-2 rounded bg-bg-tertiary text-text-secondary hover:text-accent-primary transition-all cursor-pointer"
@@ -821,6 +941,52 @@ export default function AdminDashboardPage() {
                       placeholder="<h2>Subheading</h2><p>Your technical details...</p>"
                     />
                   </div>
+
+                  <div>
+                    <label htmlFor="p-linkedin" className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1.5 font-mono">
+                      LinkedIn Post Text (shared with the article link)
+                    </label>
+                    <textarea
+                      id="p-linkedin"
+                      rows={5}
+                      value={linkedinPost}
+                      onChange={(e) => setLinkedinPost(e.target.value)}
+                      className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary resize-none"
+                      placeholder="Hook + key takeaways + #hashtags. Defaults to title and summary."
+                    />
+                  </div>
+
+                  <details className="rounded border border-border-color/60 p-3" open={Boolean(trTitle)}>
+                    <summary className="text-[10px] font-bold text-text-tertiary uppercase tracking-wider font-mono cursor-pointer">
+                      Turkish Version (optional)
+                    </summary>
+                    <div className="space-y-3 mt-3">
+                      <input
+                        type="text"
+                        aria-label="Turkish title"
+                        value={trTitle}
+                        onChange={(e) => setTrTitle(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="Başlık"
+                      />
+                      <input
+                        type="text"
+                        aria-label="Turkish summary"
+                        value={trSummary}
+                        onChange={(e) => setTrSummary(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        placeholder="Özet"
+                      />
+                      <textarea
+                        aria-label="Turkish content"
+                        rows={8}
+                        value={trContent}
+                        onChange={(e) => setTrContent(e.target.value)}
+                        className="w-full px-3 py-2 rounded border border-border-color bg-bg-primary text-text-primary text-sm font-mono focus:outline-none focus:ring-1 focus:ring-accent-primary resize-none"
+                        placeholder="<h2>Alt başlık</h2><p>İçerik...</p>"
+                      />
+                    </div>
+                  </details>
 
                   <Button
                     type="submit"

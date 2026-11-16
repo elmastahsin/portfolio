@@ -1,129 +1,62 @@
 "use client";
 
 import React from "react";
-import Card from "../ui/Card";
+import Section from "../ui/Section";
+import Reveal from "../ui/Reveal";
 import { useProfile } from "../ProfileContext";
 import { useLanguage } from "../LanguageContext";
 import { translations } from "@/data/profile";
-import { Briefcase, GraduationCap, MapPin, Compass, CheckCircle, Globe } from "lucide-react";
 
 export default function About() {
   const { profile } = useProfile();
   const { about, location } = profile;
   const { language } = useLanguage();
   const tLabels = translations[language].labels;
+  const tSections = translations[language].sections;
 
-  const details = [
-    { icon: <Briefcase className="text-accent-primary" size={18} />, label: tLabels.currentRole, value: about.currentRole },
-    { icon: <GraduationCap className="text-accent-primary" size={18} />, label: tLabels.educationSummary, value: about.educationSummary },
-    { icon: <Compass className="text-accent-primary" size={18} />, label: tLabels.careerFocus, value: about.careerFocus },
-    { icon: <MapPin className="text-accent-primary" size={18} />, label: language === "tr" ? "Konum" : "Location", value: location },
+  // Lead with the first sentence in full ink and let the rest fall back to grey,
+  // the way Apple sets an intro paragraph.
+  const splitAt = about.bio.search(/[.!?]\s/);
+  const lead = splitAt > 0 ? about.bio.slice(0, splitAt + 1) : about.bio;
+  const rest = splitAt > 0 ? about.bio.slice(splitAt + 1) : "";
+
+  const facts = [
+    { label: tLabels.currentRole, value: about.currentRole },
+    { label: tLabels.educationSummary, value: about.educationSummary },
+    { label: tLabels.careerFocus, value: about.careerFocus },
+    { label: language === "tr" ? "Konum" : "Location", value: location },
   ];
 
   return (
-    <section id="about" className="py-20 px-6 max-w-6xl mx-auto scroll-mt-16">
-      {/* Section Title */}
-      <div className="mb-12 font-mono">
-        <div className="text-xs text-text-tertiary dark:text-accent-primary/80 font-bold mb-1">// 01. init_about_profile()</div>
-        <h2 className="font-display font-bold text-2xl md:text-3xl text-text-primary flex items-center gap-1">
-          <span className="text-accent-secondary">func</span> initAbout<span className="text-text-tertiary">()</span> <span className="text-text-tertiary">{`{`}</span>
-        </h2>
+    <Section id="about" title={tSections.aboutTitle} subtitle={tSections.aboutSubtitle}>
+      <Reveal>
+        <p className="max-w-4xl font-display font-semibold text-[clamp(1.5rem,1.15rem+1.4vw,2.25rem)] leading-[1.22] tracking-[-0.018em] text-text-primary">
+          {lead}
+          {rest && <span className="text-text-secondary">{rest}</span>}
+        </p>
+      </Reveal>
+
+      <dl className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
+        {facts.map((fact, idx) => (
+          <Reveal key={fact.label} delay={idx * 60} className="border-t border-border-color pt-4">
+            <dt className="text-sm text-text-secondary">{fact.label}</dt>
+            <dd className="mt-1.5 text-[17px] leading-snug text-text-primary">{fact.value}</dd>
+          </Reveal>
+        ))}
+      </dl>
+
+      <div className="mt-14 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+        <Reveal className="border-t border-border-color pt-4">
+          <h3 className="text-sm text-text-secondary">{tLabels.interests}</h3>
+          <p className="mt-1.5 text-[17px] leading-relaxed text-text-primary">{about.interests.join(" · ")}</p>
+        </Reveal>
+        {profile.languages?.length > 0 && (
+          <Reveal delay={60} className="border-t border-border-color pt-4">
+            <h3 className="text-sm text-text-secondary">{language === "tr" ? "Diller" : "Languages"}</h3>
+            <p className="mt-1.5 text-[17px] leading-relaxed text-text-primary">{profile.languages.join(" · ")}</p>
+          </Reveal>
+        )}
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Bio & Core Info */}
-        <div className="lg:col-span-7 space-y-6">
-          <p className="text-base md:text-lg text-text-secondary leading-relaxed font-normal">
-            {about.bio}
-          </p>
-
-          {/* Quick Profile Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {details.map((detail, idx) => (
-              <Card key={idx} hoverEffect={false} glassmorphism={true} className="flex gap-4 p-4 items-start">
-                <div className="p-2.5 rounded-lg bg-accent-muted/40 dark:bg-accent-muted/10 shrink-0">
-                  {detail.icon}
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-0.5">
-                    {detail.label}
-                  </span>
-                  <span className="text-sm font-medium text-text-primary leading-tight">
-                    {detail.value}
-                  </span>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Column: Code Accent Card & Interests */}
-        <div className="lg:col-span-5 space-y-6">
-          {/* Mock Code System Architecture Accent Card */}
-          <Card hoverEffect={true} glassmorphism={true} className="p-5 font-mono text-xs overflow-hidden border border-border-color">
-            <div className="flex items-center gap-1.5 border-b border-border-color pb-3 mb-4">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-              <span className="text-text-tertiary ml-2 font-sans select-none text-[10px]">engineer.config.json</span>
-            </div>
-            <pre className="text-text-secondary leading-normal">
-              {`{
-  "developer": {
-    "name": "${profile.name}",
-    "role": "${profile.title}",
-    "stack": ["Java", "Spring Boot", "Kafka"],
-    "methods": ["Microservices", "Docker", "AWS"],
-    "focus": "Enterprise Backend Systems",
-    "mode": "active_development"
-  }
-}`}
-            </pre>
-          </Card>
-
-          {/* Interests Card */}
-          <Card hoverEffect={false} glassmorphism={true} className="p-6">
-            <h3 className="font-display font-semibold text-lg text-text-primary mb-4 flex items-center gap-2">
-              <CheckCircle size={18} className="text-accent-primary" />
-              {tLabels.interests}
-            </h3>
-            <div className="flex flex-wrap gap-2.5">
-              {about.interests.map((interest, index) => (
-                <span
-                  key={index}
-                  className="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-bg-tertiary text-text-secondary border border-border-color hover:border-accent-primary/40 dark:hover:border-accent-primary/20 hover:text-text-primary transition-all duration-200"
-                >
-                  {interest}
-                </span>
-              ))}
-            </div>
-          </Card>
-
-          {/* Languages Card */}
-          {profile.languages && profile.languages.length > 0 && (
-            <Card hoverEffect={false} glassmorphism={true} className="p-6">
-              <h3 className="font-display font-semibold text-lg text-text-primary mb-4 flex items-center gap-2">
-                <Globe size={18} className="text-accent-primary" />
-                {language === "tr" ? "Diller" : "Languages"}
-              </h3>
-              <div className="flex flex-wrap gap-2.5">
-                {profile.languages.map((lang, index) => (
-                  <span
-                    key={index}
-                    className="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-bg-tertiary text-text-secondary border border-border-color hover:border-accent-primary/40 dark:hover:border-accent-primary/20 hover:text-text-primary transition-all duration-200"
-                  >
-                    {lang}
-                  </span>
-                ))}
-              </div>
-            </Card>
-          )}
-        </div>
-      </div>
-      
-      {/* Closing Function Brace */}
-      <div className="font-mono text-text-tertiary text-sm mt-8 select-none">{"}"}</div>
-    </section>
+    </Section>
   );
 }
-
